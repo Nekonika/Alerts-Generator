@@ -6,6 +6,9 @@ Public Class Main_Form
     'Translations for Issue Texts
     Public IssueTexts As New Dictionary(Of String, String) From {
         {"Underscore_Missing", "If IsFormatted is set to 'true', then the variable name requires to have an underscore in it!"},
+        {"IsFormatted_Is_Set_Falsely", "IsFormatted is set to 'false', even tho the variable name has an underscore in it!"},
+        {"Type_Missing", "You need to specify a type for this Alert!"},
+        {"Filename_Missing", "Please add a Filename here (the file where the alert is used in)!"},
         {"Var_Name_Missing", "You are required to add a Variable name!"},
         {"Default_Translation_Missing", "You are required to add a default Tanslation (in english)!"},
         {"Advanced_Translation_Missing", "You seem to have missed a translation for a custom language."}
@@ -62,10 +65,18 @@ Public Class Main_Form
         'Checks if every field that should be is filled in and there is nothing missing.
         'Make sure all rows in which the variable contains an "_" are marked as IsFormatted and remind user that the Bot might crash if any given translation with IsFormatted does not contain the right amount of variables.
 
-        If CheckData() Then
+        Dim CheckDataResult As CheckDataResult = CheckData()
 
+        If CheckDataResult.IsSuccess Then
+            Debug.WriteLine("No issues found while checking the table.")
         Else
             Debug.WriteLine("Seems like the was an error checking the data.")
+            If MsgBox($"Do you want to see more informations about this?", MsgBoxStyle.YesNo, $"Found {CheckDataResult.Mismatches.Count} issues!") = MsgBoxResult.Yes Then
+                For i = 0 To CheckDataResult.Mismatches.Count - 1
+                    Dim Issue = CheckDataResult.Mismatches(i)
+                    MsgBox(Issue.ToString(), MsgBoxStyle.OkOnly, $"Issue [{i + 1}/{CheckDataResult.Mismatches.Count}]")
+                Next
+            End If
         End If
 
         'Show Message, that the Current set is issued and where
@@ -120,32 +131,68 @@ Public Class Main_Form
         Next
     End Sub
 
-    Function CheckData() As Object
+    Function CheckData() As CheckDataResult
         Dim Mismatches As New List(Of Mismatch)
-        Dim IsSuccess As Boolean = True
 
         For i = 0 To DataGridView1.Rows.Count - 2
-            Dim Var_Name = DataGridView1.Rows(i).Cells(3)       'Variable Name
-            Dim Var_Name_Val = If(Var_Name.Value, "")
+            Dim Row = DataGridView1.Rows(i)
 
-            Dim IsFormatted = DataGridView1.Rows(i).Cells(6)    'Is Formatted
+            '
+            ' storing variables 
+            '
+
+            'Type
+            Dim Type_Name_Val = If(Row.Cells(0).Value, "")
+
+            'Filename
+            Dim File_Name_Val = If(Row.Cells(1).Value, "")
+
+            'Variable Name
+            Dim Var_Name_Val = If(Row.Cells(2).Value.ToString.ToUpper(), "")
+            Row.Cells(2).Value = Var_Name_Val 'Make sure variable names are upper case only
+
+            'Default Translation
+            Dim Def_Tran_Val = If(Row.Cells(3).Value, "")
+
+            'Custom Translation
+            Dim Adv_Tran_Val = If(Row.Cells(4).Value, "")
+
+            'Is Formatted
+            Dim IsFormatted = DataGridView1.Rows(i).Cells(5)
             Dim IsFormatted_Val As Boolean = (Not IsNothing(IsFormatted.Value) AndAlso IsFormatted.Value = "true")
 
-            Dim Def_Tran = DataGridView1.Rows(i).Cells(4)       'Default Translation
-            Dim Def_Tran_Val = If(Def_Tran.Value, "")
 
-            Dim Adv_Tran = DataGridView1.Rows(i).Cells(5)       'Custom Translation
-            Dim Adv_Tran_Val = If(Adv_Tran.Value, "")
+            '
+            ' checking for issues
+            '
+
+            'type is not specified (cell 1)
+            If String.IsNullOrWhiteSpace(Type_Name_Val) Then Mismatches.Add(New Mismatch(1, i, "Type_Missing", Type_Name_Val))
+
+            'filename missing (cell 2)
+            If String.IsNullOrWhiteSpace(File_Name_Val) Then Mismatches.Add(New Mismatch(2, i, "Filename_Missing", File_Name_Val))
+
+            'default translation missing (cell 4)
+            If String.IsNullOrWhiteSpace(Def_Tran_Val) Then Mismatches.Add(New Mismatch(4, i, "Default_Translation_Missing", Def_Tran_Val))
+
+            'custom translation missing (cell 5)
+            If String.IsNullOrWhiteSpace(Adv_Tran_Val) Then Mismatches.Add(New Mismatch(5, i, "Advanced_Translation_Missing", Adv_Tran_Val))
 
             If String.IsNullOrWhiteSpace(Var_Name_Val) Then
-                Mismatches.Add(New Mismatch(3, i, IssueTexts("Var_Name_Missing"), Var_Name_Val))
+                'var name is missing (cell 3)
+                Mismatches.Add(New Mismatch(3, i, "Var_Name_Missing", Var_Name_Val))
             Else
-                If IsFormatted_Val AndAlso Not Var_Name_Val.ToString().Contains("_") Then Mismatches.Add(New Mismatch(3, i, IssueTexts("Underscore_Missing"), Var_Name_Val))
+                'IsFormatted is true but the is no underscore in the variables name (cell 6)
+                Dim Contains_Underscore As Boolean = Var_Name_Val.ToString().Contains("_")
+                If IsFormatted_Val AndAlso Not Contains_Underscore Then
+                    Mismatches.Add(New Mismatch(3, i, "Underscore_Missing", Var_Name_Val))
+                ElseIf Contains_Underscore AndAlso Not IsFormatted_Val Then
+                    Mismatches.Add(New Mismatch(6, i, "IsFormatted_Is_Set_Falsely", Var_Name_Val))
+                End If
             End If
-
-            If String.IsNullOrWhiteSpace(Var_Name_Val) Then Mismatches.Add(New Mismatch(4, i, IssueTexts("Default_Translation_Missing"), ))
-
         Next
+
+        Return New CheckDataResult(Mismatches.Count = 0, Mismatches)
     End Function
 
 
@@ -177,7 +224,6 @@ Public Class Mismatch
     Property Row As Integer
     Property IssueText As String
     Property CellContent As String
-    Property WarningLevel As WarningLevel
 
     Sub New(Column As Integer, Row As Integer, IssueText As String, CellContent As String)
         Me.Column = Column
@@ -190,8 +236,7 @@ Public Class Mismatch
         Return _
             $"Row {Row} Column {Column} issued!" & vbNewLine &
             $"Context: '{CellContent}'" & vbNewLine &
-            $"Error Text: {Main_Form.IssueTexts(IssueText)}" & vbNewLine &
-            $"Error Level: {[Enum].GetName(WarningLevel.GetType(), WarningLevel)} ({WarningLevel})"
+            $"Error Text: {Main_Form.IssueTexts(IssueText)}"
     End Function
 End Class
 
@@ -203,21 +248,4 @@ Public Class CheckDataResult
         Me.IsSuccess = IsSuccess
         Me.Mismatches = Mismatches
     End Sub
-
-    Function GetHighestWarningLevel() As WarningLevel
-        Dim Highest As WarningLevel = WarningLevel.None
-
-        For Each Mismatch In Mismatches
-            Highest = IIf(Mismatch.WarningLevel > Highest, Mismatch.WarningLevel, Highest)
-        Next
-
-        Return Highest
-    End Function
 End Class
-
-Public Enum WarningLevel
-    None = 0
-    Low = 1
-    Medium = 2
-    High = 3
-End Enum
