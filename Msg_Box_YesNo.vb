@@ -1,4 +1,4 @@
-﻿Public Class Msg_Box
+﻿Public Class Msg_Box_YesNo
     Private Sub DontAskAgain_cb_CheckedChanged(sender As CheckBox, e As EventArgs) Handles DontAskAgain_cb.CheckedChanged
         RemoveRowDontAskAgain = sender.Checked
     End Sub

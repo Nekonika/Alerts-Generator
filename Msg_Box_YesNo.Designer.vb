@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class Msg_Box
+Partial Class Msg_Box_YesNo
     Inherits System.Windows.Forms.Form
 
     'Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
@@ -70,7 +70,7 @@ Partial Class Msg_Box
         Me.Yes_btn.Text = "Yes"
         Me.Yes_btn.UseVisualStyleBackColor = True
         '
-        'Msg_Box
+        'Msg_Box_YesNo
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -83,7 +83,7 @@ Partial Class Msg_Box
         Me.MaximumSize = New System.Drawing.Size(377, 106)
         Me.MinimizeBox = False
         Me.MinimumSize = New System.Drawing.Size(377, 106)
-        Me.Name = "Msg_Box"
+        Me.Name = "Msg_Box_YesNo"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Attention!"
         Me.TopMost = True

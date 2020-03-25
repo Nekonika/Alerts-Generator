@@ -1,6 +1,11 @@
-﻿Imports System.IO
+﻿Imports System.ComponentModel
+Imports System.IO
+Imports Newtonsoft.Json
 
 Public Class Main_Form
+
+    ReadOnly MyData As DataTable = New DataTable
+
     Private Sub SearchGo_btn_Click(sender As Object, e As EventArgs) Handles SearchGo_btn.Click
         'Start searching with the given criteria
         '(Search for "true" / "false" or text in the given column)
@@ -16,7 +21,7 @@ Public Class Main_Form
         If DataGridView1.SelectedRows.Count <= 0 Then Return 'No rows selected, which could be removed
 
         If Not RemoveRowDontAskAgain Then
-            Dim Dialog = New Msg_Box($"Are you sure that you want to remove all selected rows ({DataGridView1.SelectedRows.Count})?")
+            Dim Dialog = New Msg_Box_YesNo($"Are you sure that you want to remove all selected rows ({DataGridView1.SelectedRows.Count})?")
             If Dialog.ShowDialog() <> DialogResult.Yes Then Return
         End If
 
@@ -32,13 +37,12 @@ Public Class Main_Form
         If DataGridView1.Rows.Count <= 1 Then Return 'No rows, which could be removed
 
         If Not ClearRowsDontAskAgain Then
-            Dim Dialog = New Msg_Box($"Are you sure that you want to remove all rows ({DataGridView1.Rows.Count - 1})?")
+            Dim Dialog = New Msg_Box_YesNo($"Are you sure that you want to remove all rows ({DataGridView1.Rows.Count - 1})?")
             If Dialog.ShowDialog() <> DialogResult.Yes Then Return
         End If
 
-        For i = 0 To DataGridView1.Rows.Count - 2
-            DataGridView1.Rows.RemoveAt(i)
-        Next
+        'Delete all existing rows
+        DataGridView1.Rows.Clear()
     End Sub
 
     Private Sub OpenConfig_btn_Click(sender As Object, e As EventArgs) Handles OpenConfig_btn.Click
@@ -55,36 +59,42 @@ Public Class Main_Form
         Dim CheckDataResult As CheckDataResult = CheckData()
 
         If CheckDataResult.IsSuccess Then
-            Debug.WriteLine("No issues found while checking the table.")
+            MsgBox("No issues found after checking tables contents.", MsgBoxStyle.Information)
         Else
             Debug.WriteLine("Seems like the was an error checking the data.")
             If MsgBox($"Do you want to see more informations about this?", MsgBoxStyle.YesNo, $"Found {CheckDataResult.Mismatches.Count} issues!") = MsgBoxResult.Yes Then
                 For i = 0 To CheckDataResult.Mismatches.Count - 1
                     Dim Issue = CheckDataResult.Mismatches(i)
+                    'Show Message, that the Current set is issued and where
                     MsgBox(Issue.ToString(), MsgBoxStyle.OkOnly, $"Issue [{i + 1}/{CheckDataResult.Mismatches.Count}]")
                 Next
             End If
         End If
-
-        'Show Message, that the Current set is issued and where
     End Sub
 
     Private Sub Generate_btn_Click(sender As Object, e As EventArgs) Handles Generate_btn.Click
         'Generate the Alerts.vb as well as the alerts.json file.
         '(Maybe also ask which of those files shall be generated)
 
+        GenerateAlertsVB()
+
+        'TODO: Generate 'alerts.json'-File here!
+        'Debug.WriteLine("Successfully generated 'Alerts.vb'-File.")
     End Sub
 
     Private Sub Load_btn_Click(sender As Object, e As EventArgs) Handles Load_btn.Click
         'Load data into the DataGridView using a JSON (or CSV) file.
         '(Just open some kind of File-Picker Window)
 
+        If MsgBox($"Are you sure that you want to do that?{vbNewLine}All unsaved changed will be lost!", MsgBoxStyle.Question) = MsgBoxResult.Yes Then MyData.Load() : MyData.FillTable()
     End Sub
 
     Private Sub Save_btn_Click(sender As Object, e As EventArgs) Handles Save_btn.Click
         'Save all the data from the DataGridView usin a JSON (or CSV) file.
         '(Maybe open some kind of File-Picker Window here aswell)
 
+        MyData.ReadFromDataTable()
+        MsgBox("Successfully saved table data.", MsgBoxStyle.Information)
     End Sub
 
 
@@ -135,8 +145,9 @@ Public Class Main_Form
             Dim File_Name_Val = If(Row.Cells(1).Value, "")
 
             'Variable Name
-            Dim Var_Name_Val = If(Row.Cells(2).Value.ToString.ToUpper(), "")
-            Row.Cells(2).Value = Var_Name_Val 'Make sure variable names are upper case only
+            Dim Var_Name_Val = If(Row.Cells(2).Value, "")
+            Var_Name_Val = Var_Name_Val.ToString().ToUpper() 'Make sure variable names are upper case only
+            Row.Cells(2).Value = Var_Name_Val
 
             'Default Translation
             Dim Def_Tran_Val = If(Row.Cells(3).Value, "")
@@ -184,6 +195,97 @@ Public Class Main_Form
 
 
     '
+    ' Subs
+    '
+
+    Private Sub GenerateAlertsVB()
+        'Make sure the Path exists
+        If Not Directory.Exists(Path.GetDirectoryName(My.Settings.AlertsScriptTemplatePath)) Then Directory.CreateDirectory(Path.GetDirectoryName(My.Settings.AlertsScriptTemplatePath))
+        If Not IO.File.Exists(My.Settings.AlertsScriptTemplatePath) Then IO.File.WriteAllText(My.Settings.AlertsScriptTemplatePath, "")
+
+        Dim AlertsTemplateContent As String = IO.File.ReadAllText(My.Settings.AlertsScriptTemplatePath)
+        Dim GeneratedAlertVBContent As String = String.Empty
+        Dim GeneratedAlertVBContentVariables As String = String.Empty
+        'Dim GeneratedAlertsJsonContent As String = String.Empty
+
+        MyData.ReadFromDataTable()
+        Dim MyDataClone As DataTable = MyData.Clone()
+
+        Dim ConsoleRows As List(Of RowData) = MyDataClone.Rows.FindAll(Function(x) x.Type = AlertType.Console)
+        Dim MessageRows As List(Of RowData) = MyDataClone.Rows.FindAll(Function(x) x.Type = AlertType.Message)
+
+        If ConsoleRows.Count > 0 Then
+            GeneratedAlertVBContent += My.Settings.AlertTypeHeading.Replace("[ALERTTYPE]", "Console")
+            GeneratedAlertVBContentVariables += My.Settings.AlertTypeHeading.Replace("[ALERTTYPE]", "Console")
+
+            While ConsoleRows.Count > 0
+                Dim FirstFileName As String = ConsoleRows.First.Filename.ToString()
+                Dim SameFileRows As List(Of RowData) = ConsoleRows.FindAll(Function(x) x.Filename = FirstFileName)
+
+                GeneratedAlertVBContent += My.Settings.FilenameHeading.Replace("[FILENAME]", FirstFileName)
+                GeneratedAlertVBContentVariables += My.Settings.FilenameHeading.Replace("[FILENAME]", FirstFileName)
+
+                Dim NormalRows As List(Of RowData) = SameFileRows.FindAll(Function(x) x.IsFormatted = False)
+                Dim FormattedRows As List(Of RowData) = SameFileRows.FindAll(Function(x) x.IsFormatted = True)
+
+                GeneratedAlertVBContent += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Normal") & vbNewLine
+                GeneratedAlertVBContentVariables += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Normal") & vbNewLine
+                For Each Row In NormalRows
+                    GeneratedAlertVBContent += $"Alerts.{Row.VariableName} = ""{Row.DefaultTranslation}""{vbNewLine}"
+                    GeneratedAlertVBContentVariables += $"Public {Row.VariableName} As String{vbNewLine}"
+                Next
+
+                GeneratedAlertVBContent += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Formatted") & vbNewLine
+                GeneratedAlertVBContentVariables += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Formatted") & vbNewLine
+                For Each Row In FormattedRows
+                    GeneratedAlertVBContent += $"Alerts.{Row.VariableName} = ""{Row.DefaultTranslation}""{vbNewLine}"
+                    GeneratedAlertVBContentVariables += $"Public {Row.VariableName} As String{vbNewLine}"
+                Next
+
+                ConsoleRows.RemoveAll(Function(x) SameFileRows.Contains(x))
+            End While
+        End If
+
+        If MessageRows.Count > 0 Then
+            GeneratedAlertVBContent += My.Settings.AlertTypeHeading.Replace("[ALERTTYPE]", "Message")
+            GeneratedAlertVBContentVariables += My.Settings.AlertTypeHeading.Replace("[ALERTTYPE]", "Message")
+
+            While MessageRows.Count > 0
+                Dim FirstFileName As String = MessageRows.First.Filename.ToString()
+                Dim SameFileRows As List(Of RowData) = MessageRows.FindAll(Function(x) x.Filename = FirstFileName)
+
+                GeneratedAlertVBContent += My.Settings.FilenameHeading.Replace("[FILENAME]", FirstFileName)
+                GeneratedAlertVBContentVariables += My.Settings.FilenameHeading.Replace("[FILENAME]", FirstFileName)
+
+                Dim NormalRows As List(Of RowData) = SameFileRows.FindAll(Function(x) x.IsFormatted = False)
+                Dim FormattedRows As List(Of RowData) = SameFileRows.FindAll(Function(x) x.IsFormatted = True)
+
+                GeneratedAlertVBContent += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Normal") & vbNewLine
+                GeneratedAlertVBContentVariables += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Normal") & vbNewLine
+                For Each Row In NormalRows
+                    GeneratedAlertVBContent += $"Alerts.{Row.VariableName} = ""{Row.DefaultTranslation}""{vbNewLine}"
+                    GeneratedAlertVBContentVariables += $"Public {Row.VariableName} As String{vbNewLine}"
+                Next
+
+                GeneratedAlertVBContent += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Formatted") & vbNewLine
+                GeneratedAlertVBContentVariables += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Formatted") & vbNewLine
+                For Each Row In FormattedRows
+                    GeneratedAlertVBContent += $"Alerts.{Row.VariableName} = ""{Row.DefaultTranslation}""{vbNewLine}"
+                    GeneratedAlertVBContentVariables += $"Public {Row.VariableName} As String{vbNewLine}"
+                Next
+
+                MessageRows.RemoveAll(Function(x) SameFileRows.Contains(x))
+            End While
+        End If
+
+        IO.File.WriteAllText(My.Settings.AlertsScriptResultPath, AlertsTemplateContent.Replace("[ALERTS_VB]", GeneratedAlertVBContent).Replace("[ALERTS_VARS_VB]", GeneratedAlertVBContentVariables))
+        Debug.WriteLine("Successfully generated 'Alerts.vb'-File.")
+        'IO.File.WriteAllText(My.Settings.AlertsScriptResultPath, AlertsTemplateContent.Replace("[ALERTS_VB]", GeneratedAlertVBContent))
+        'Debug.WriteLine("Successfully generated 'alerts.json'-File.")
+    End Sub
+
+
+    '
     ' Events
     '
 
@@ -199,12 +301,132 @@ Public Class Main_Form
         If String.IsNullOrWhiteSpace(My.Settings.AlertsScriptResultPath) Then My.Settings.AlertsScriptResultPath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Alerts.vb")
         If String.IsNullOrWhiteSpace(My.Settings.AlertsJsonResultPath) Then My.Settings.AlertsJsonResultPath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "alerts.json")
 
-        'Fill table with the data from the data.json
+        'Check Placeholder Variables
+        If String.IsNullOrWhiteSpace(My.Settings.AlertTypeHeading) Then My.Settings.AlertTypeHeading = $"{vbNewLine}{vbNewLine}'{vbNewLine}' [ALERTTYPE]{vbNewLine}'{vbNewLine}"
+        If String.IsNullOrWhiteSpace(My.Settings.FilenameHeading) Then My.Settings.FilenameHeading = $"{vbNewLine}{vbNewLine}' ## [FILENAME] ##{vbNewLine}"
+        If String.IsNullOrWhiteSpace(My.Settings.FormattedTitle) Then My.Settings.FormattedTitle = $"{vbNewLine}'[FORMATTED]"
 
-
+        MyData.Load() 'Initialize MyData (As DataTable)
+        MyData.FillTable() 'Fill table with the data from the data.json
     End Sub
 
+    Private Sub Main_Form_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        'Ask the user if he really wants to quit without saving
+        e.Cancel = (MsgBox($"Are you sure that you want to quit?{vbNewLine}Did you save your current changes?", MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel)
+    End Sub
 End Class
+
+
+'
+' Classes
+'
+
+Public Class DataTable
+    Property LastChanged As Date
+    Property Rows As List(Of RowData)
+
+    Sub New()
+        LastChanged = Date.Now
+        Rows = New List(Of RowData)
+    End Sub
+
+    Private Sub AddRow(RowData As RowData)
+        Rows.Add(RowData)
+    End Sub
+
+    Sub ReadFromDataTable()
+        Try
+            Rows.Clear()
+
+            For i = 0 To Main_Form.DataGridView1.Rows.Count - 2
+                Dim Row As DataGridViewRow = Main_Form.DataGridView1.Rows(i)
+                AddRow(New RowData([Enum].Parse(GetType(AlertType), Row.Cells(0).Value), Row.Cells(1).Value, Row.Cells(2).Value, Row.Cells(3).Value, Row.Cells(4).Value, Row.Cells(5).Value = "true"))
+            Next
+
+            Save()
+        Catch ex As Exception
+            MsgBox("Could not load data into 'DataTable'-Object.{vbNewLine}Try using Check button before Saving!", MsgBoxStyle.Critical)
+        End Try
+    End Sub
+
+    Sub Save()
+        LastChanged = Date.Now
+        Dim json As String = JsonConvert.SerializeObject(Me, Formatting.Indented)
+
+        Try
+            If Not Directory.Exists(My.Settings.MyDataPath) Then Directory.CreateDirectory(My.Settings.MyDataPath)
+        Catch ex As Exception
+            'Fail Silently
+        End Try
+
+        File.WriteAllText(My.Settings.MyDataPath, json)
+    End Sub
+
+    Sub Load()
+        If File.Exists(My.Settings.MyDataPath) Then
+            Try
+                Dim json = File.ReadAllText(My.Settings.MyDataPath)
+                Dim Data As DataTable = JsonConvert.DeserializeObject(Of DataTable)(json)
+
+                'Insert data into the object
+                LastChanged = Data.LastChanged
+                Rows = Data.Rows
+
+            Catch ex As Exception
+                MsgBox($"Unable to read 'data.json' file.{vbNewLine}Try deleting the File. (Remember to make a backup if needed!)", MsgBoxStyle.Critical)
+                Application.Exit()
+
+            End Try
+        Else
+            Save()
+        End If
+    End Sub
+
+    Sub FillTable()
+        Main_Form.DataGridView1.Rows.Clear()
+
+        For Each Row In Rows
+            Main_Form.DataGridView1.Rows.Add([Enum].GetName(GetType(AlertType), Row.Type),
+                                                Row.Filename,
+                                                Row.VariableName,
+                                                Row.DefaultTranslation,
+                                                Row.AdvancedTranslation,
+                                                Row.IsFormatted
+            )
+        Next
+    End Sub
+
+    Function Clone() As DataTable
+        Return New DataTable With {
+            .LastChanged = LastChanged,
+            .Rows = Rows
+        }
+    End Function
+
+End Class
+
+Public Class RowData
+    Property Type As AlertType
+    Property Filename As String
+    Property VariableName As String
+    Property DefaultTranslation As String
+    Property AdvancedTranslation As String
+    Property IsFormatted As Boolean
+
+    Sub New(Type As AlertType, Filename As String, VariableName As String, DefaultTranslation As String, AdvancedTranslation As String, IsFormatted As Boolean)
+        Me.Type = Type
+        Me.Filename = Filename
+        Me.VariableName = VariableName
+        Me.DefaultTranslation = DefaultTranslation
+        Me.AdvancedTranslation = AdvancedTranslation
+        Me.IsFormatted = IsFormatted
+    End Sub
+End Class
+
+Public Enum AlertType
+    Console
+    Message
+End Enum
 
 Public Class Mismatch
     Property Column As Integer

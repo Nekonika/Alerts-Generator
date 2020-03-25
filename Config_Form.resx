@@ -120,6 +120,7 @@
   <data name="Label4.Text" xml:space="preserve">
     <value>Remember that the "Alerts.vb" template should contain all neccessary code to run on its own.
 You shall have a backup of that file, just in case something goes wrong.
-Also make sure that your "Alerts.vb" only contains the '[ALERTS_VB]' placeholder once!</value>
+Also make sure that your "Alerts.vb" only contains the '[ALERTS_VB]' and 
+[ALERTS_VARS_VB] placeholder once!</value>
   </data>
 </root>

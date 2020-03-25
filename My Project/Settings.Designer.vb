@@ -101,6 +101,42 @@ Namespace My
                 Me("MyDataPath") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property AlertTypeHeading() As String
+            Get
+                Return CType(Me("AlertTypeHeading"),String)
+            End Get
+            Set
+                Me("AlertTypeHeading") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property FilenameHeading() As String
+            Get
+                Return CType(Me("FilenameHeading"),String)
+            End Get
+            Set
+                Me("FilenameHeading") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property FormattedTitle() As String
+            Get
+                Return CType(Me("FormattedTitle"),String)
+            End Get
+            Set
+                Me("FormattedTitle") = value
+            End Set
+        End Property
     End Class
 End Namespace
 
