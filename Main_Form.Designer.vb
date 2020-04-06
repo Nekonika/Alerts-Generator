@@ -41,6 +41,7 @@ Partial Class Main_Form
         Me.RemoveRow_btn = New System.Windows.Forms.Button()
         Me.Generate_btn = New System.Windows.Forms.Button()
         Me.Check_btn = New System.Windows.Forms.Button()
+        Me.LoadFromAlertsJson_btn = New System.Windows.Forms.Button()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -228,11 +229,22 @@ Partial Class Main_Form
         Me.Check_btn.Text = "Check"
         Me.Check_btn.UseVisualStyleBackColor = True
         '
+        'LoadFromAlertsJson_btn
+        '
+        Me.LoadFromAlertsJson_btn.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.LoadFromAlertsJson_btn.Location = New System.Drawing.Point(733, 496)
+        Me.LoadFromAlertsJson_btn.Name = "LoadFromAlertsJson_btn"
+        Me.LoadFromAlertsJson_btn.Size = New System.Drawing.Size(136, 23)
+        Me.LoadFromAlertsJson_btn.TabIndex = 13
+        Me.LoadFromAlertsJson_btn.Text = "Load from alerts.json"
+        Me.LoadFromAlertsJson_btn.UseVisualStyleBackColor = True
+        '
         'Main_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1043, 531)
+        Me.Controls.Add(Me.LoadFromAlertsJson_btn)
         Me.Controls.Add(Me.Check_btn)
         Me.Controls.Add(Me.Generate_btn)
         Me.Controls.Add(Me.RemoveRow_btn)
@@ -273,4 +285,5 @@ Partial Class Main_Form
     Friend WithEvents DefaultVal As DataGridViewTextBoxColumn
     Friend WithEvents TranslatedValue As DataGridViewTextBoxColumn
     Friend WithEvents IsFormatted As DataGridViewCheckBoxColumn
+    Friend WithEvents LoadFromAlertsJson_btn As Button
 End Class

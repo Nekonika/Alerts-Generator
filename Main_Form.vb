@@ -76,10 +76,34 @@ Public Class Main_Form
         'Generate the Alerts.vb as well as the alerts.json file.
         '(Maybe also ask which of those files shall be generated)
 
+        'Make sure all important files exist
+        If Not Directory.Exists(Path.GetDirectoryName(My.Settings.AlertsScriptTemplatePath)) Then Directory.CreateDirectory(Path.GetDirectoryName(My.Settings.AlertsScriptTemplatePath))
+        If Not Directory.Exists(Path.GetDirectoryName(My.Settings.AlertsScriptResultPath)) Then Directory.CreateDirectory(Path.GetDirectoryName(My.Settings.AlertsScriptResultPath))
+        If Not Directory.Exists(Path.GetDirectoryName(My.Settings.AlertsJsonResultPath)) Then Directory.CreateDirectory(Path.GetDirectoryName(My.Settings.AlertsJsonResultPath))
+        If Not IO.File.Exists(My.Settings.AlertsScriptTemplatePath) Then IO.File.WriteAllText(My.Settings.AlertsScriptTemplatePath, "")
+        If Not IO.File.Exists(My.Settings.AlertsScriptResultPath) Then IO.File.WriteAllText(My.Settings.AlertsScriptResultPath, "")
+        If Not IO.File.Exists(My.Settings.AlertsJsonResultPath) Then IO.File.WriteAllText(My.Settings.AlertsJsonResultPath, "")
+
+
         GenerateAlertsVB()
 
         'TODO: Generate 'alerts.json'-File here!
         'Debug.WriteLine("Successfully generated 'Alerts.vb'-File.")
+    End Sub
+
+    Private Sub LoadFromAlertsJson_btn_Click(sender As Object, e As EventArgs) Handles LoadFromAlertsJson_btn.Click
+        'Load data from alerts.json file
+        'Maybe open file explorer to pick a file
+
+        'Remind the user, that this will also remove all previous rows!
+        'TODO: Continue here!
+        Select Case MsgBox("", MsgBoxStyle.YesNoCancel)
+            Case MsgBoxResult.Yes
+
+            Case MsgBoxResult.No
+            Case Else
+
+        End Select
     End Sub
 
     Private Sub Load_btn_Click(sender As Object, e As EventArgs) Handles Load_btn.Click
@@ -193,24 +217,62 @@ Public Class Main_Form
         Return New CheckDataResult(Mismatches.Count = 0, Mismatches)
     End Function
 
+    Function TryImportAlertsJSON(Optional AsTranslated As Boolean = True) As Boolean
+        Dim MyFileDialog As New OpenFileDialog() With {.CheckFileExists = True,
+                                .CheckPathExists = True,
+                                .DereferenceLinks = True,
+                                .FileName = "alerts.json",
+                                .Filter = "JSON-File (*.json)|*.json",
+                                .InitialDirectory = Directory.GetCurrentDirectory(),
+                                .Multiselect = False,
+                                .ShowReadOnly = False,
+                                .SupportMultiDottedExtensions = False,
+                                .Title = "Please select your old alerts.json file to import:"}
+
+        If MyFileDialog.ShowDialog() = DialogResult.OK Then
+            Dim MyDict As Dictionary(Of String, String)
+            Dim LoadDataAsAlreadyTranslated As Boolean = False
+
+            Try
+                Dim Json As String = IO.File.ReadAllText(MyFileDialog.FileName.ToString())
+                MyDict = JsonConvert.DeserializeObject(Of Dictionary(Of String, String))(Json)
+            Catch ex As Exception
+                Debug.WriteLine("Error while reading Json: " & ex.Message.ToString())
+                MsgBox("Seems like we could not deserialize that JSON-File." & vbNewLine &
+                       "Please make sure to select an actual alerts.json!",
+                       MsgBoxStyle.Exclamation)
+                Return False
+            End Try
+
+            If DataGridView1.Rows.Count > 2 Then
+                If MsgBox("Your current table already contains data!" & vbNewLine &
+                          "Do you want to override those rows?",
+                          MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                    DataGridView1.Rows.Clear()
+                End If
+            End If
+
+            MyDict.ToList().ForEach(Sub(x) DataGridView1.Rows.Add(String.Empty, String.Empty, x.Key.ToString(), IIf(LoadDataAsAlreadyTranslated, String.Empty, x.Value.ToString()), IIf(LoadDataAsAlreadyTranslated, x.Value.ToString(), String.Empty), x.Key.ToString().Contains("_")))
+
+        End If
+
+        Return True
+    End Function
+
 
     '
     ' Subs
     '
 
     Private Sub GenerateAlertsVB()
-        'Make sure the Path exists
-        If Not Directory.Exists(Path.GetDirectoryName(My.Settings.AlertsScriptTemplatePath)) Then Directory.CreateDirectory(Path.GetDirectoryName(My.Settings.AlertsScriptTemplatePath))
-        If Not IO.File.Exists(My.Settings.AlertsScriptTemplatePath) Then IO.File.WriteAllText(My.Settings.AlertsScriptTemplatePath, "")
-
         Dim AlertsTemplateContent As String = IO.File.ReadAllText(My.Settings.AlertsScriptTemplatePath)
         Dim GeneratedAlertVBContent As String = String.Empty
         Dim GeneratedAlertVBContentVariables As String = String.Empty
-        'Dim GeneratedAlertsJsonContent As String = String.Empty
 
-        MyData.ReadFromDataTable()
+        'Get current data from our object into a seperate variable
         Dim MyDataClone As DataTable = MyData.Clone()
 
+        'Sort by alert-type (console/message)
         Dim ConsoleRows As List(Of RowData) = MyDataClone.Rows.FindAll(Function(x) x.Type = AlertType.Console)
         Dim MessageRows As List(Of RowData) = MyDataClone.Rows.FindAll(Function(x) x.Type = AlertType.Message)
 
@@ -263,14 +325,14 @@ Public Class Main_Form
                 GeneratedAlertVBContent += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Normal") & vbNewLine
                 GeneratedAlertVBContentVariables += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Normal") & vbNewLine
                 For Each Row In NormalRows
-                    GeneratedAlertVBContent += $"Alerts.{Row.VariableName} = ""{Row.DefaultTranslation}""{vbNewLine}"
+                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation}""{vbNewLine}"
                     GeneratedAlertVBContentVariables += $"Public {Row.VariableName} As String{vbNewLine}"
                 Next
 
                 GeneratedAlertVBContent += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Formatted") & vbNewLine
                 GeneratedAlertVBContentVariables += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Formatted") & vbNewLine
                 For Each Row In FormattedRows
-                    GeneratedAlertVBContent += $"Alerts.{Row.VariableName} = ""{Row.DefaultTranslation}""{vbNewLine}"
+                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation}""{vbNewLine}"
                     GeneratedAlertVBContentVariables += $"Public {Row.VariableName} As String{vbNewLine}"
                 Next
 
@@ -280,8 +342,22 @@ Public Class Main_Form
 
         IO.File.WriteAllText(My.Settings.AlertsScriptResultPath, AlertsTemplateContent.Replace("[ALERTS_VB]", GeneratedAlertVBContent).Replace("[ALERTS_VARS_VB]", GeneratedAlertVBContentVariables))
         Debug.WriteLine("Successfully generated 'Alerts.vb'-File.")
-        'IO.File.WriteAllText(My.Settings.AlertsScriptResultPath, AlertsTemplateContent.Replace("[ALERTS_VB]", GeneratedAlertVBContent))
-        'Debug.WriteLine("Successfully generated 'alerts.json'-File.")
+    End Sub
+
+    Sub GenerateAlertsJSON()
+        Dim JsonObject As New Dictionary(Of String, String)
+
+        'Get current data from our object into a seperate variable
+        Dim MyDataClone As DataTable = MyData.Clone()
+
+        For Each Row In MyDataClone.Rows
+            JsonObject.Add(Row.VariableName, Row.AdvancedTranslation)
+        Next
+
+        'OPTIONAL: Sort data by Key
+
+        IO.File.WriteAllText(My.Settings.AlertsJsonResultPath, JsonConvert.SerializeObject(JsonObject))
+        Debug.WriteLine("Successfully generated 'alerts.json'-File.")
     End Sub
 
 
