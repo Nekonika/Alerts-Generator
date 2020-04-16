@@ -93,16 +93,13 @@ Public Class Main_Form
 
     Private Sub LoadFromAlertsJson_btn_Click(sender As Object, e As EventArgs) Handles LoadFromAlertsJson_btn.Click
         'Load data from alerts.json file
-        'Maybe open file explorer to pick a file
 
-        'Remind the user, that this will also remove all previous rows!
-        'TODO: Continue here!
-        Select Case MsgBox("", MsgBoxStyle.YesNoCancel)
+        Select Case MsgBox($"Do you want to import your 'alerts.vb' as translated?{vbNewLine}(Yes = Translated | No = Default Translation)", MsgBoxStyle.YesNoCancel)
             Case MsgBoxResult.Yes
+                If Not TryImportAlertsJSON(AsTranslated:=True) Then MsgBox($"Seems like we could not import your 'alerts.vb' file!", MsgBoxStyle.Critical)
 
             Case MsgBoxResult.No
-            Case Else
-
+                If Not TryImportAlertsJSON(AsTranslated:=False) Then MsgBox($"Seems like we could not import your 'alerts.vb' file!", MsgBoxStyle.Critical)
         End Select
     End Sub
 
@@ -248,11 +245,28 @@ Public Class Main_Form
                 If MsgBox("Your current table already contains data!" & vbNewLine &
                           "Do you want to override those rows?",
                           MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+
                     DataGridView1.Rows.Clear()
+                    MyDict.ToList().ForEach(Sub(x) DataGridView1.Rows.Add(String.Empty, String.Empty, x.Key.ToString(), IIf(LoadDataAsAlreadyTranslated, String.Empty, x.Value.ToString()), IIf(LoadDataAsAlreadyTranslated, x.Value.ToString(), String.Empty), x.Key.ToString().Contains("_")))
+                Else
+                    Dim Errored_Translations As Integer = 0 'The count of errored translations from our table
+                    Dim No_Translation_Found As Integer = 0 'The count of translations which were not found in the alerts.vb file
+                    Dim Translation_Found As Integer = 0    'The count of translations which have sucessfully been added to our table
+                    Dim New_Translations As Integer = 0     'The count of translations which were not found in the existing table
+
+                    For i = 0 To DataGridView1.Rows.Count - 2
+                        Dim Row As DataGridViewRow = DataGridView1.Rows(i)
+                        Dim VarName As String = If(Row.Cells(2).ToString(), "")
+                        Dim MyDictIndex As Integer = MyDict.ToList().FindIndex(Function(X) X.Key.ToUpper() = VarName.ToUpper())
+
+                        If String.IsNullOrWhiteSpace(VarName) Then Errored_Translations += 1 : Continue For
+                        If MyDictIndex = -1 Then No_Translation_Found += 1 : Continue For
+                        Row.Cells()
+                    Next
+                    MyDict.ToList().ForEach(Sub(x) DataGridView1.Rows.Add(String.Empty, String.Empty, x.Key.ToString(), IIf(LoadDataAsAlreadyTranslated, String.Empty, x.Value.ToString()), IIf(LoadDataAsAlreadyTranslated, x.Value.ToString(), String.Empty), x.Key.ToString().Contains("_")))
                 End If
             End If
 
-            MyDict.ToList().ForEach(Sub(x) DataGridView1.Rows.Add(String.Empty, String.Empty, x.Key.ToString(), IIf(LoadDataAsAlreadyTranslated, String.Empty, x.Value.ToString()), IIf(LoadDataAsAlreadyTranslated, x.Value.ToString(), String.Empty), x.Key.ToString().Contains("_")))
 
         End If
 
