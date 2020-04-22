@@ -25,26 +25,26 @@ Partial Class Config_Form
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Config_Form))
         Me.AlertsTemplatePath_tb = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
-        Me.Button1 = New System.Windows.Forms.Button()
-        Me.Button2 = New System.Windows.Forms.Button()
+        Me.ALertsTemplatePathBrowse_btn = New System.Windows.Forms.Button()
+        Me.AlertsResultPathBrowse_btn = New System.Windows.Forms.Button()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.AlertsResultPath_tb = New System.Windows.Forms.TextBox()
-        Me.Button3 = New System.Windows.Forms.Button()
+        Me.AlertsJsonPathBrowse_btn = New System.Windows.Forms.Button()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.AlertsJsonPath_tb = New System.Windows.Forms.TextBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.DataPath_tb = New System.Windows.Forms.TextBox()
-        Me.Button4 = New System.Windows.Forms.Button()
+        Me.DataPathBrowse_btn = New System.Windows.Forms.Button()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
-        Me.Label6 = New System.Windows.Forms.Label()
-        Me.AlertTypeHeading_tb = New System.Windows.Forms.TextBox()
-        Me.FilenameHeading_tb = New System.Windows.Forms.TextBox()
-        Me.Label7 = New System.Windows.Forms.Label()
         Me.FormattedTitle_tb = New System.Windows.Forms.TextBox()
         Me.Label8 = New System.Windows.Forms.Label()
+        Me.FilenameHeading_tb = New System.Windows.Forms.TextBox()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.AlertTypeHeading_tb = New System.Windows.Forms.TextBox()
+        Me.Label6 = New System.Windows.Forms.Label()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -69,25 +69,25 @@ Partial Class Config_Form
         Me.Label1.TabIndex = 1
         Me.Label1.Text = "Where is the ""Alerts.vb"" script template saved?:"
         '
-        'Button1
+        'ALertsTemplatePathBrowse_btn
         '
-        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button1.Location = New System.Drawing.Point(436, 89)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(75, 23)
-        Me.Button1.TabIndex = 2
-        Me.Button1.Text = "Browse"
-        Me.Button1.UseVisualStyleBackColor = True
+        Me.ALertsTemplatePathBrowse_btn.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ALertsTemplatePathBrowse_btn.Location = New System.Drawing.Point(436, 89)
+        Me.ALertsTemplatePathBrowse_btn.Name = "ALertsTemplatePathBrowse_btn"
+        Me.ALertsTemplatePathBrowse_btn.Size = New System.Drawing.Size(75, 23)
+        Me.ALertsTemplatePathBrowse_btn.TabIndex = 2
+        Me.ALertsTemplatePathBrowse_btn.Text = "Browse"
+        Me.ALertsTemplatePathBrowse_btn.UseVisualStyleBackColor = True
         '
-        'Button2
+        'AlertsResultPathBrowse_btn
         '
-        Me.Button2.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button2.Location = New System.Drawing.Point(436, 138)
-        Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(75, 23)
-        Me.Button2.TabIndex = 5
-        Me.Button2.Text = "Browse"
-        Me.Button2.UseVisualStyleBackColor = True
+        Me.AlertsResultPathBrowse_btn.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AlertsResultPathBrowse_btn.Location = New System.Drawing.Point(436, 138)
+        Me.AlertsResultPathBrowse_btn.Name = "AlertsResultPathBrowse_btn"
+        Me.AlertsResultPathBrowse_btn.Size = New System.Drawing.Size(75, 23)
+        Me.AlertsResultPathBrowse_btn.TabIndex = 5
+        Me.AlertsResultPathBrowse_btn.Text = "Browse"
+        Me.AlertsResultPathBrowse_btn.UseVisualStyleBackColor = True
         '
         'Label2
         '
@@ -108,15 +108,15 @@ Partial Class Config_Form
         Me.AlertsResultPath_tb.Size = New System.Drawing.Size(421, 20)
         Me.AlertsResultPath_tb.TabIndex = 3
         '
-        'Button3
+        'AlertsJsonPathBrowse_btn
         '
-        Me.Button3.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button3.Location = New System.Drawing.Point(436, 187)
-        Me.Button3.Name = "Button3"
-        Me.Button3.Size = New System.Drawing.Size(75, 23)
-        Me.Button3.TabIndex = 8
-        Me.Button3.Text = "Browse"
-        Me.Button3.UseVisualStyleBackColor = True
+        Me.AlertsJsonPathBrowse_btn.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AlertsJsonPathBrowse_btn.Location = New System.Drawing.Point(436, 187)
+        Me.AlertsJsonPathBrowse_btn.Name = "AlertsJsonPathBrowse_btn"
+        Me.AlertsJsonPathBrowse_btn.Size = New System.Drawing.Size(75, 23)
+        Me.AlertsJsonPathBrowse_btn.TabIndex = 8
+        Me.AlertsJsonPathBrowse_btn.Text = "Browse"
+        Me.AlertsJsonPathBrowse_btn.UseVisualStyleBackColor = True
         '
         'Label3
         '
@@ -141,15 +141,15 @@ Partial Class Config_Form
         '
         Me.GroupBox1.Controls.Add(Me.Label5)
         Me.GroupBox1.Controls.Add(Me.DataPath_tb)
-        Me.GroupBox1.Controls.Add(Me.Button4)
+        Me.GroupBox1.Controls.Add(Me.DataPathBrowse_btn)
         Me.GroupBox1.Controls.Add(Me.Label1)
-        Me.GroupBox1.Controls.Add(Me.Button3)
+        Me.GroupBox1.Controls.Add(Me.AlertsJsonPathBrowse_btn)
         Me.GroupBox1.Controls.Add(Me.AlertsTemplatePath_tb)
         Me.GroupBox1.Controls.Add(Me.Label3)
-        Me.GroupBox1.Controls.Add(Me.Button1)
+        Me.GroupBox1.Controls.Add(Me.ALertsTemplatePathBrowse_btn)
         Me.GroupBox1.Controls.Add(Me.AlertsJsonPath_tb)
         Me.GroupBox1.Controls.Add(Me.AlertsResultPath_tb)
-        Me.GroupBox1.Controls.Add(Me.Button2)
+        Me.GroupBox1.Controls.Add(Me.AlertsResultPathBrowse_btn)
         Me.GroupBox1.Controls.Add(Me.Label2)
         Me.GroupBox1.Location = New System.Drawing.Point(12, 101)
         Me.GroupBox1.Name = "GroupBox1"
@@ -177,15 +177,15 @@ Partial Class Config_Form
         Me.DataPath_tb.Size = New System.Drawing.Size(421, 20)
         Me.DataPath_tb.TabIndex = 9
         '
-        'Button4
+        'DataPathBrowse_btn
         '
-        Me.Button4.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button4.Location = New System.Drawing.Point(436, 40)
-        Me.Button4.Name = "Button4"
-        Me.Button4.Size = New System.Drawing.Size(75, 23)
-        Me.Button4.TabIndex = 11
-        Me.Button4.Text = "Browse"
-        Me.Button4.UseVisualStyleBackColor = True
+        Me.DataPathBrowse_btn.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.DataPathBrowse_btn.Location = New System.Drawing.Point(436, 40)
+        Me.DataPathBrowse_btn.Name = "DataPathBrowse_btn"
+        Me.DataPathBrowse_btn.Size = New System.Drawing.Size(75, 23)
+        Me.DataPathBrowse_btn.TabIndex = 11
+        Me.DataPathBrowse_btn.Text = "Browse"
+        Me.DataPathBrowse_btn.UseVisualStyleBackColor = True
         '
         'GroupBox2
         '
@@ -225,24 +225,24 @@ Partial Class Config_Form
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "Formatting Settings"
         '
-        'Label6
+        'FormattedTitle_tb
         '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(6, 26)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(106, 13)
-        Me.Label6.TabIndex = 0
-        Me.Label6.Text = "Alerts Type Heading:"
-        '
-        'AlertTypeHeading_tb
-        '
-        Me.AlertTypeHeading_tb.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.FormattedTitle_tb.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AlertTypeHeading_tb.Location = New System.Drawing.Point(9, 42)
-        Me.AlertTypeHeading_tb.Multiline = True
-        Me.AlertTypeHeading_tb.Name = "AlertTypeHeading_tb"
-        Me.AlertTypeHeading_tb.Size = New System.Drawing.Size(338, 86)
-        Me.AlertTypeHeading_tb.TabIndex = 1
+        Me.FormattedTitle_tb.Location = New System.Drawing.Point(9, 239)
+        Me.FormattedTitle_tb.Multiline = True
+        Me.FormattedTitle_tb.Name = "FormattedTitle_tb"
+        Me.FormattedTitle_tb.Size = New System.Drawing.Size(338, 54)
+        Me.FormattedTitle_tb.TabIndex = 5
+        '
+        'Label8
+        '
+        Me.Label8.AutoSize = True
+        Me.Label8.Location = New System.Drawing.Point(6, 223)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(124, 13)
+        Me.Label8.TabIndex = 4
+        Me.Label8.Text = "Normal / Formatted Title:"
         '
         'FilenameHeading_tb
         '
@@ -263,24 +263,24 @@ Partial Class Config_Form
         Me.Label7.TabIndex = 2
         Me.Label7.Text = "Filename Heading:"
         '
-        'FormattedTitle_tb
+        'AlertTypeHeading_tb
         '
-        Me.FormattedTitle_tb.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.AlertTypeHeading_tb.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.FormattedTitle_tb.Location = New System.Drawing.Point(9, 239)
-        Me.FormattedTitle_tb.Multiline = True
-        Me.FormattedTitle_tb.Name = "FormattedTitle_tb"
-        Me.FormattedTitle_tb.Size = New System.Drawing.Size(338, 54)
-        Me.FormattedTitle_tb.TabIndex = 5
+        Me.AlertTypeHeading_tb.Location = New System.Drawing.Point(9, 42)
+        Me.AlertTypeHeading_tb.Multiline = True
+        Me.AlertTypeHeading_tb.Name = "AlertTypeHeading_tb"
+        Me.AlertTypeHeading_tb.Size = New System.Drawing.Size(338, 86)
+        Me.AlertTypeHeading_tb.TabIndex = 1
         '
-        'Label8
+        'Label6
         '
-        Me.Label8.AutoSize = True
-        Me.Label8.Location = New System.Drawing.Point(6, 223)
-        Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(124, 13)
-        Me.Label8.TabIndex = 4
-        Me.Label8.Text = "Normal / Formatted Title:"
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(6, 26)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(106, 13)
+        Me.Label6.TabIndex = 0
+        Me.Label6.Text = "Alerts Type Heading:"
         '
         'Config_Form
         '
@@ -304,11 +304,11 @@ Partial Class Config_Form
 
     Friend WithEvents AlertsTemplatePath_tb As TextBox
     Friend WithEvents Label1 As Label
-    Friend WithEvents Button1 As Button
-    Friend WithEvents Button2 As Button
+    Friend WithEvents ALertsTemplatePathBrowse_btn As Button
+    Friend WithEvents AlertsResultPathBrowse_btn As Button
     Friend WithEvents Label2 As Label
     Friend WithEvents AlertsResultPath_tb As TextBox
-    Friend WithEvents Button3 As Button
+    Friend WithEvents AlertsJsonPathBrowse_btn As Button
     Friend WithEvents Label3 As Label
     Friend WithEvents AlertsJsonPath_tb As TextBox
     Friend WithEvents GroupBox1 As GroupBox
@@ -316,7 +316,7 @@ Partial Class Config_Form
     Friend WithEvents Label4 As Label
     Friend WithEvents Label5 As Label
     Friend WithEvents DataPath_tb As TextBox
-    Friend WithEvents Button4 As Button
+    Friend WithEvents DataPathBrowse_btn As Button
     Friend WithEvents GroupBox3 As GroupBox
     Friend WithEvents FormattedTitle_tb As TextBox
     Friend WithEvents Label8 As Label

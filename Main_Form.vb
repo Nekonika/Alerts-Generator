@@ -54,6 +54,9 @@ Public Class Main_Form
         'Checks if every field that should be is filled in and there is nothing missing.
         'Make sure all rows in which the variable contains an "_" are marked as IsFormatted and remind user that the Bot might crash if any given translation with IsFormatted does not contain the right amount of variables.
 
+        'Apply sorting before checking the data
+        DataGridView1.Sort(DataGridView1.Columns(1), ListSortDirection.Ascending)
+
         Dim CheckDataResult As CheckDataResult = CheckData()
 
         If CheckDataResult.IsSuccess Then
@@ -108,7 +111,7 @@ Public Class Main_Form
         'Load data into the DataGridView using a JSON (or CSV) file.
         '(Just open some kind of File-Picker Window)
 
-        If MsgBox($"Are you sure that you want to do that?{vbNewLine}All unsaved changed will be lost!", MsgBoxStyle.Question) = MsgBoxResult.Yes Then MyData.Load() : MyData.FillTable()
+        If MsgBox($"Are you sure that you want to do that?{vbNewLine}All unsaved changed will be lost!", MsgBoxStyle.Question) = MsgBoxResult.Ok Then DataGridView1.Rows.Clear() : MyData.Load() : MyData.FillTable()
     End Sub
 
     Private Sub Save_btn_Click(sender As Object, e As EventArgs) Handles Save_btn.Click
@@ -332,14 +335,14 @@ Public Class Main_Form
                 GeneratedAlertVBContent += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Normal") & vbNewLine
                 GeneratedAlertVBContentVariables += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Normal") & vbNewLine
                 For Each Row In NormalRows
-                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation.Replace("""", "\""").Replace(vbNewLine, "\r\n")}""{vbNewLine}"
+                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation.Replace("ä", "ae").Replace("ö", "oe").Replace("ü", "ue").Replace("""", """""").Replace(vbNewLine, "\r\n")}""{vbNewLine}"
                     GeneratedAlertVBContentVariables += $"{vbTab}Public {Row.VariableName} As String{vbNewLine}"
                 Next
 
                 GeneratedAlertVBContent += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Formatted") & vbNewLine
                 GeneratedAlertVBContentVariables += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Formatted") & vbNewLine
                 For Each Row In FormattedRows
-                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation.Replace("""", "\""").Replace(vbNewLine, "\r\n")}""{vbNewLine}"
+                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation.Replace("ä", "ae").Replace("ö", "oe").Replace("ü", "ue").Replace("""", """""").Replace(vbNewLine, "\r\n")}""{vbNewLine}"
                     GeneratedAlertVBContentVariables += $"{vbTab}Public {Row.VariableName} As String{vbNewLine}"
                 Next
 
@@ -364,14 +367,14 @@ Public Class Main_Form
                 GeneratedAlertVBContent += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Normal") & vbNewLine
                 GeneratedAlertVBContentVariables += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Normal") & vbNewLine
                 For Each Row In NormalRows
-                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation.Replace("""", "\""").Replace(vbNewLine, "\r\n")}""{vbNewLine}"
+                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation.Replace("""", """""").Replace(vbNewLine, "\r\n")}""{vbNewLine}"
                     GeneratedAlertVBContentVariables += $"{vbTab}Public {Row.VariableName} As String{vbNewLine}"
                 Next
 
                 GeneratedAlertVBContent += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Formatted") & vbNewLine
                 GeneratedAlertVBContentVariables += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Formatted") & vbNewLine
                 For Each Row In FormattedRows
-                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation.Replace("""", "\""").Replace(vbNewLine, "\r\n")}""{vbNewLine}"
+                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation.Replace("""", """""").Replace(vbNewLine, "\r\n")}""{vbNewLine}"
                     GeneratedAlertVBContentVariables += $"{vbTab}Public {Row.VariableName} As String{vbNewLine}"
                 Next
 

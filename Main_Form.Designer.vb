@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class Main_Form
     Inherits System.Windows.Forms.Form
 
     'Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class Main_Form
     'Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
     'Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
     'Das Bearbeiten mit dem Code-Editor ist nicht möglich.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.DataGridView1 = New System.Windows.Forms.DataGridView()
         Me.Type = New System.Windows.Forms.DataGridViewComboBoxColumn()
@@ -211,7 +211,7 @@ Partial Class Main_Form
         '
         Me.Generate_btn.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Generate_btn.ForeColor = System.Drawing.Color.Green
-        Me.Generate_btn.Location = New System.Drawing.Point(433, 496)
+        Me.Generate_btn.Location = New System.Drawing.Point(426, 496)
         Me.Generate_btn.Name = "Generate_btn"
         Me.Generate_btn.Size = New System.Drawing.Size(101, 23)
         Me.Generate_btn.TabIndex = 11
@@ -222,7 +222,7 @@ Partial Class Main_Form
         '
         Me.Check_btn.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Check_btn.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.Check_btn.Location = New System.Drawing.Point(357, 496)
+        Me.Check_btn.Location = New System.Drawing.Point(350, 496)
         Me.Check_btn.Name = "Check_btn"
         Me.Check_btn.Size = New System.Drawing.Size(70, 23)
         Me.Check_btn.TabIndex = 12
