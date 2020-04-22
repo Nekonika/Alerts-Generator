@@ -211,6 +211,8 @@ Public Class Main_Form
             End If
         Next
 
+        'TODO: Count underscores in Var-Name and compare to count of '{' & '}' in translations to make sure all variables are given
+
         Return New CheckDataResult(Mismatches.Count = 0, Mismatches)
     End Function
 
@@ -249,6 +251,20 @@ Public Class Main_Form
                     DataGridView1.Rows.Clear()
                     MyDict.ToList().ForEach(Sub(x) DataGridView1.Rows.Add(String.Empty, String.Empty, x.Key.ToString(), IIf(LoadDataAsAlreadyTranslated, String.Empty, x.Value.ToString()), IIf(LoadDataAsAlreadyTranslated, x.Value.ToString(), String.Empty), x.Key.ToString().Contains("_")))
                 Else
+                    'Go though each row in Datagridview
+
+                    'Do we have that alert in our translation file?
+
+                    'yes:
+                    'apply translation
+                    'remove translation from alerts file, so we wont use it a 2nd time
+
+                    'no:
+                    'add alert name from datagridview to our <notranslationfound> List(Of String)
+
+                    'After each row was checked we've got all alerts which have not been user left...
+                    'append these at the bottom of datagridview
+
                     Dim Errored_Translations As Integer = 0 'The count of errored translations from our table
                     Dim No_Translation_Found As Integer = 0 'The count of translations which were not found in the alerts.vb file
                     Dim Translation_Found As Integer = 0    'The count of translations which have sucessfully been added to our table
@@ -261,7 +277,7 @@ Public Class Main_Form
 
                         If String.IsNullOrWhiteSpace(VarName) Then Errored_Translations += 1 : Continue For
                         If MyDictIndex = -1 Then No_Translation_Found += 1 : Continue For
-                        Row.Cells()
+                        'Row.Cells()
                     Next
                     MyDict.ToList().ForEach(Sub(x) DataGridView1.Rows.Add(String.Empty, String.Empty, x.Key.ToString(), IIf(LoadDataAsAlreadyTranslated, String.Empty, x.Value.ToString()), IIf(LoadDataAsAlreadyTranslated, x.Value.ToString(), String.Empty), x.Key.ToString().Contains("_")))
                 End If
