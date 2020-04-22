@@ -21,8 +21,7 @@ Public Class Main_Form
         If DataGridView1.SelectedRows.Count <= 0 Then Return 'No rows selected, which could be removed
 
         If Not RemoveRowDontAskAgain Then
-            Dim Dialog = New Msg_Box_YesNo($"Are you sure that you want to remove all selected rows ({DataGridView1.SelectedRows.Count})?")
-            If Dialog.ShowDialog() <> DialogResult.Yes Then Return
+            If MsgBox($"Are you sure that you want to remove all selected rows ({DataGridView1.SelectedRows.Count})?", MsgBoxStyle.YesNo) <> DialogResult.Yes Then Return
         End If
 
         For Each Row As DataGridViewRow In DataGridView1.SelectedRows
@@ -37,8 +36,7 @@ Public Class Main_Form
         If DataGridView1.Rows.Count <= 1 Then Return 'No rows, which could be removed
 
         If Not ClearRowsDontAskAgain Then
-            Dim Dialog = New Msg_Box_YesNo($"Are you sure that you want to remove all rows ({DataGridView1.Rows.Count - 1})?")
-            If Dialog.ShowDialog() <> DialogResult.Yes Then Return
+            If MsgBox($"Are you sure that you want to remove all rows ({DataGridView1.Rows.Count - 1})?", MsgBoxStyle.YesNo) <> DialogResult.Yes Then Return
         End If
 
         'Delete all existing rows
@@ -86,6 +84,9 @@ Public Class Main_Form
 
 
         GenerateAlertsVB()
+        GenerateAlertsJSON()
+
+        MsgBox("Successfully Generated Files!")
 
         'TODO: Generate 'alerts.json'-File here!
         'Debug.WriteLine("Successfully generated 'Alerts.vb'-File.")
@@ -160,21 +161,21 @@ Public Class Main_Form
             '
 
             'Type
-            Dim Type_Name_Val = If(Row.Cells(0).Value, "")
+            Dim Type_Name_Val As String = If(Row.Cells(0).Value, "")
 
             'Filename
-            Dim File_Name_Val = If(Row.Cells(1).Value, "")
+            Dim File_Name_Val As String = If(Row.Cells(1).Value, "")
 
             'Variable Name
-            Dim Var_Name_Val = If(Row.Cells(2).Value, "")
+            Dim Var_Name_Val As String = If(Row.Cells(2).Value, "")
             Var_Name_Val = Var_Name_Val.ToString().ToUpper() 'Make sure variable names are upper case only
             Row.Cells(2).Value = Var_Name_Val
 
             'Default Translation
-            Dim Def_Tran_Val = If(Row.Cells(3).Value, "")
+            Dim Def_Tran_Val As String = If(Row.Cells(3).Value, "")
 
             'Custom Translation
-            Dim Adv_Tran_Val = If(Row.Cells(4).Value, "")
+            Dim Adv_Tran_Val As String = If(Row.Cells(4).Value, "")
 
             'Is Formatted
             Dim IsFormatted = DataGridView1.Rows(i).Cells(5)
@@ -202,11 +203,22 @@ Public Class Main_Form
                 Mismatches.Add(New Mismatch(3, i, "Var_Name_Missing", Var_Name_Val))
             Else
                 'IsFormatted is true but the is no underscore in the variables name (cell 6)
-                Dim Contains_Underscore As Boolean = Var_Name_Val.ToString().Contains("_")
+                Dim Contains_Underscore As Boolean = Var_Name_Val.Contains("_")
                 If IsFormatted_Val AndAlso Not Contains_Underscore Then
                     Mismatches.Add(New Mismatch(3, i, "Underscore_Missing", Var_Name_Val))
                 ElseIf Contains_Underscore AndAlso Not IsFormatted_Val Then
                     Mismatches.Add(New Mismatch(6, i, "IsFormatted_Is_Set_Falsely", Var_Name_Val))
+                End If
+
+                'Check variables in translations
+                Dim RequiredVarCount As Integer = Var_Name_Val.Count(Function(X) X.Equals("_"c))
+
+                If RequiredVarCount > 0 Then
+                    For c = 0 To RequiredVarCount - 1
+                        Dim currentVar As String = $"{{{c}}}"
+                        If Not Def_Tran_Val.Contains(currentVar) Then Mismatches.Add(New Mismatch(4, i, "Formatting_Not_Match", Def_Tran_Val))
+                        If Not Adv_Tran_Val.Contains(currentVar) Then Mismatches.Add(New Mismatch(5, i, "Formatting_Not_Match", Adv_Tran_Val))
+                    Next
                 End If
             End If
         Next
@@ -217,27 +229,28 @@ Public Class Main_Form
     End Function
 
     Function TryImportAlertsJSON(Optional AsTranslated As Boolean = True) As Boolean
-        Dim MyFileDialog As New OpenFileDialog() With {.CheckFileExists = True,
-                                .CheckPathExists = True,
-                                .DereferenceLinks = True,
-                                .FileName = "alerts.json",
-                                .Filter = "JSON-File (*.json)|*.json",
-                                .InitialDirectory = Directory.GetCurrentDirectory(),
-                                .Multiselect = False,
-                                .ShowReadOnly = False,
-                                .SupportMultiDottedExtensions = False,
-                                .Title = "Please select your old alerts.json file to import:"}
+        Dim MyFileDialog As New OpenFileDialog() With {
+            .CheckFileExists = True,
+            .CheckPathExists = True,
+            .DereferenceLinks = True,
+            .FileName = "alerts.json",
+            .Filter = "JSON-File (*.json)|*.json",
+            .InitialDirectory = Directory.GetCurrentDirectory(),
+            .Multiselect = False,
+            .ShowReadOnly = False,
+            .SupportMultiDottedExtensions = False,
+            .Title = "Please select your old alerts.json file to import:"
+        }
 
         If MyFileDialog.ShowDialog() = DialogResult.OK Then
             Dim MyDict As Dictionary(Of String, String)
-            Dim LoadDataAsAlreadyTranslated As Boolean = False
 
             Try
                 Dim Json As String = IO.File.ReadAllText(MyFileDialog.FileName.ToString())
                 MyDict = JsonConvert.DeserializeObject(Of Dictionary(Of String, String))(Json)
             Catch ex As Exception
                 Debug.WriteLine("Error while reading Json: " & ex.Message.ToString())
-                MsgBox("Seems like we could not deserialize that JSON-File." & vbNewLine &
+                MsgBox("Seems Like we could Not deserialize that JSON-File." & vbNewLine &
                        "Please make sure to select an actual alerts.json!",
                        MsgBoxStyle.Exclamation)
                 Return False
@@ -249,41 +262,37 @@ Public Class Main_Form
                           MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
 
                     DataGridView1.Rows.Clear()
-                    MyDict.ToList().ForEach(Sub(x) DataGridView1.Rows.Add(String.Empty, String.Empty, x.Key.ToString(), IIf(LoadDataAsAlreadyTranslated, String.Empty, x.Value.ToString()), IIf(LoadDataAsAlreadyTranslated, x.Value.ToString(), String.Empty), x.Key.ToString().Contains("_")))
+                    MyDict.ToList().ForEach(Sub(x) DataGridView1.Rows.Add(String.Empty, String.Empty, x.Key.ToString(), IIf(AsTranslated, String.Empty, x.Value.ToString()), IIf(AsTranslated, x.Value.ToString(), String.Empty), x.Key.ToString().Contains("_")))
                 Else
-                    'Go though each row in Datagridview
-
-                    'Do we have that alert in our translation file?
-
-                    'yes:
-                    'apply translation
-                    'remove translation from alerts file, so we wont use it a 2nd time
-
-                    'no:
-                    'add alert name from datagridview to our <notranslationfound> List(Of String)
-
-                    'After each row was checked we've got all alerts which have not been user left...
-                    'append these at the bottom of datagridview
-
-                    Dim Errored_Translations As Integer = 0 'The count of errored translations from our table
-                    Dim No_Translation_Found As Integer = 0 'The count of translations which were not found in the alerts.vb file
-                    Dim Translation_Found As Integer = 0    'The count of translations which have sucessfully been added to our table
-                    Dim New_Translations As Integer = 0     'The count of translations which were not found in the existing table
+                    Dim AllTranslationsCount As Integer = MyDict.Count
+                    Dim NoTranslFound As New List(Of String)
+                    Dim TranslNotInDGV As New List(Of String)
 
                     For i = 0 To DataGridView1.Rows.Count - 2
                         Dim Row As DataGridViewRow = DataGridView1.Rows(i)
-                        Dim VarName As String = If(Row.Cells(2).ToString(), "")
-                        Dim MyDictIndex As Integer = MyDict.ToList().FindIndex(Function(X) X.Key.ToUpper() = VarName.ToUpper())
 
-                        If String.IsNullOrWhiteSpace(VarName) Then Errored_Translations += 1 : Continue For
-                        If MyDictIndex = -1 Then No_Translation_Found += 1 : Continue For
-                        'Row.Cells()
+                        Dim VarName As String = If(Row.Cells(2).Value?.ToString(), "")
+                        If String.IsNullOrWhiteSpace(VarName) Then Debug.WriteLine($"Seems Like we've got an issue with the variables name in line {i + 1}: '{VarName}'!") : Continue For
+
+                        Dim MyDictEntry As KeyValuePair(Of String, String) = MyDict.FirstOrDefault(Function(X) X.Key.ToUpper() = VarName.ToUpper())
+                        If String.IsNullOrEmpty(MyDictEntry.Key) Then NoTranslFound.Add(VarName) : Continue For
+
+                        Row.Cells(IIf(AsTranslated, 4, 3)).Value = MyDictEntry.Value.ToString()
+                        MyDict.Remove(MyDictEntry.Key)
                     Next
-                    MyDict.ToList().ForEach(Sub(x) DataGridView1.Rows.Add(String.Empty, String.Empty, x.Key.ToString(), IIf(LoadDataAsAlreadyTranslated, String.Empty, x.Value.ToString()), IIf(LoadDataAsAlreadyTranslated, x.Value.ToString(), String.Empty), x.Key.ToString().Contains("_")))
+
+                    TranslNotInDGV = MyDict.Keys.ToList()
+                    MyDict.ToList().ForEach(Sub(X) DataGridView1.Rows.Add(String.Empty, String.Empty, X.Key.ToUpper(), IIf(AsTranslated, String.Empty, X.Value), IIf(AsTranslated, X.Value, String.Empty), X.Key.Contains("_")))
+
+                    Dim Successful_Translations As Integer = AllTranslationsCount - NoTranslFound.Count - TranslNotInDGV.Count
+
+                    If Successful_Translations > 0 Then Debug.WriteLine($"Successfully translated {Successful_Translations} alerts!")
+                    If NoTranslFound.Count > 0 Then Debug.WriteLine($"{NoTranslFound.Count} translations could not be found!")
+                    If TranslNotInDGV.Count > 0 Then Debug.WriteLine($"{TranslNotInDGV.Count} were added to the table!")
                 End If
+            Else
+                MyDict.ToList().ForEach(Sub(x) DataGridView1.Rows.Add(String.Empty, String.Empty, x.Key.ToString(), IIf(AsTranslated, String.Empty, x.Value.ToString()), IIf(AsTranslated, x.Value.ToString(), String.Empty), x.Key.ToString().Contains("_")))
             End If
-
-
         End If
 
         Return True
@@ -323,15 +332,15 @@ Public Class Main_Form
                 GeneratedAlertVBContent += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Normal") & vbNewLine
                 GeneratedAlertVBContentVariables += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Normal") & vbNewLine
                 For Each Row In NormalRows
-                    GeneratedAlertVBContent += $"Alerts.{Row.VariableName} = ""{Row.DefaultTranslation}""{vbNewLine}"
-                    GeneratedAlertVBContentVariables += $"Public {Row.VariableName} As String{vbNewLine}"
+                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation.Replace("""", "\""").Replace(vbNewLine, "\r\n")}""{vbNewLine}"
+                    GeneratedAlertVBContentVariables += $"{vbTab}Public {Row.VariableName} As String{vbNewLine}"
                 Next
 
                 GeneratedAlertVBContent += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Formatted") & vbNewLine
                 GeneratedAlertVBContentVariables += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Formatted") & vbNewLine
                 For Each Row In FormattedRows
-                    GeneratedAlertVBContent += $"Alerts.{Row.VariableName} = ""{Row.DefaultTranslation}""{vbNewLine}"
-                    GeneratedAlertVBContentVariables += $"Public {Row.VariableName} As String{vbNewLine}"
+                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation.Replace("""", "\""").Replace(vbNewLine, "\r\n")}""{vbNewLine}"
+                    GeneratedAlertVBContentVariables += $"{vbTab}Public {Row.VariableName} As String{vbNewLine}"
                 Next
 
                 ConsoleRows.RemoveAll(Function(x) SameFileRows.Contains(x))
@@ -355,15 +364,15 @@ Public Class Main_Form
                 GeneratedAlertVBContent += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Normal") & vbNewLine
                 GeneratedAlertVBContentVariables += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Normal") & vbNewLine
                 For Each Row In NormalRows
-                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation}""{vbNewLine}"
-                    GeneratedAlertVBContentVariables += $"Public {Row.VariableName} As String{vbNewLine}"
+                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation.Replace("""", "\""").Replace(vbNewLine, "\r\n")}""{vbNewLine}"
+                    GeneratedAlertVBContentVariables += $"{vbTab}Public {Row.VariableName} As String{vbNewLine}"
                 Next
 
                 GeneratedAlertVBContent += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Formatted") & vbNewLine
                 GeneratedAlertVBContentVariables += My.Settings.FormattedTitle.Replace("[FORMATTED]", "Formatted") & vbNewLine
                 For Each Row In FormattedRows
-                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation}""{vbNewLine}"
-                    GeneratedAlertVBContentVariables += $"Public {Row.VariableName} As String{vbNewLine}"
+                    GeneratedAlertVBContent += $"{vbTab}{vbTab}alert.{Row.VariableName} = ""{Row.DefaultTranslation.Replace("""", "\""").Replace(vbNewLine, "\r\n")}""{vbNewLine}"
+                    GeneratedAlertVBContentVariables += $"{vbTab}Public {Row.VariableName} As String{vbNewLine}"
                 Next
 
                 MessageRows.RemoveAll(Function(x) SameFileRows.Contains(x))
@@ -371,7 +380,6 @@ Public Class Main_Form
         End If
 
         IO.File.WriteAllText(My.Settings.AlertsScriptResultPath, AlertsTemplateContent.Replace("[ALERTS_VB]", GeneratedAlertVBContent).Replace("[ALERTS_VARS_VB]", GeneratedAlertVBContentVariables))
-        Debug.WriteLine("Successfully generated 'Alerts.vb'-File.")
     End Sub
 
     Sub GenerateAlertsJSON()
@@ -386,8 +394,7 @@ Public Class Main_Form
 
         'OPTIONAL: Sort data by Key
 
-        IO.File.WriteAllText(My.Settings.AlertsJsonResultPath, JsonConvert.SerializeObject(JsonObject))
-        Debug.WriteLine("Successfully generated 'alerts.json'-File.")
+        IO.File.WriteAllText(My.Settings.AlertsJsonResultPath, JsonConvert.SerializeObject(JsonObject, Formatting.Indented))
     End Sub
 
 
@@ -418,7 +425,9 @@ Public Class Main_Form
 
     Private Sub Main_Form_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         'Ask the user if he really wants to quit without saving
-        e.Cancel = (MsgBox($"Are you sure that you want to quit?{vbNewLine}Did you save your current changes?", MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel)
+        Dim Result As MsgBoxResult = MsgBox($"Do you want to save your recent changes?", MsgBoxStyle.YesNoCancel)
+        If Result = MsgBoxResult.Yes Then MyData.Save()
+        e.Cancel = (Result = MsgBoxResult.Cancel)
     End Sub
 End Class
 
@@ -459,12 +468,7 @@ Public Class DataTable
         LastChanged = Date.Now
         Dim json As String = JsonConvert.SerializeObject(Me, Formatting.Indented)
 
-        Try
-            If Not Directory.Exists(My.Settings.MyDataPath) Then Directory.CreateDirectory(My.Settings.MyDataPath)
-        Catch ex As Exception
-            'Fail Silently
-        End Try
-
+        If Not Directory.Exists(My.Settings.MyDataPath) Then Directory.CreateDirectory(Path.GetDirectoryName(My.Settings.MyDataPath))
         File.WriteAllText(My.Settings.MyDataPath, json)
     End Sub
 
@@ -481,7 +485,6 @@ Public Class DataTable
             Catch ex As Exception
                 MsgBox($"Unable to read 'data.json' file.{vbNewLine}Try deleting the File. (Remember to make a backup if needed!)", MsgBoxStyle.Critical)
                 Application.Exit()
-
             End Try
         Else
             Save()

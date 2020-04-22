@@ -25,7 +25,8 @@ Module Settings
         {"Filename_Missing", "Please add a Filename here (the file where the alert is used in)!"},
         {"Var_Name_Missing", "You are required to add a Variable name!"},
         {"Default_Translation_Missing", "You are required to add a default Tanslation (in english)!"},
-        {"Advanced_Translation_Missing", "You seem to have missed a translation for a custom language."}
+        {"Advanced_Translation_Missing", "You seem to have missed a translation for a custom language."},
+        {"Formatting_Not_Match", "The amount of variables in the var name an in the translations does not match!"}
     }
 
 

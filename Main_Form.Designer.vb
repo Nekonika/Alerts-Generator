@@ -231,7 +231,7 @@ Partial Class Main_Form
         '
         'LoadFromAlertsJson_btn
         '
-        Me.LoadFromAlertsJson_btn.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.LoadFromAlertsJson_btn.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.LoadFromAlertsJson_btn.Location = New System.Drawing.Point(733, 496)
         Me.LoadFromAlertsJson_btn.Name = "LoadFromAlertsJson_btn"
         Me.LoadFromAlertsJson_btn.Size = New System.Drawing.Size(136, 23)
