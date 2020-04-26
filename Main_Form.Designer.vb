@@ -42,6 +42,8 @@ Partial Class Main_Form
         Me.Generate_btn = New System.Windows.Forms.Button()
         Me.Check_btn = New System.Windows.Forms.Button()
         Me.LoadFromAlertsJson_btn = New System.Windows.Forms.Button()
+        Me.GetImplementationCode_btn = New System.Windows.Forms.Button()
+        Me.ImplementCode_cb = New System.Windows.Forms.CheckBox()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -56,7 +58,7 @@ Partial Class Main_Form
         Me.DataGridView1.Location = New System.Drawing.Point(12, 43)
         Me.DataGridView1.Name = "DataGridView1"
         Me.DataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.DataGridView1.Size = New System.Drawing.Size(1019, 447)
+        Me.DataGridView1.Size = New System.Drawing.Size(1158, 447)
         Me.DataGridView1.TabIndex = 0
         '
         'Type
@@ -113,7 +115,7 @@ Partial Class Main_Form
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.SearchText_tb.Location = New System.Drawing.Point(74, 12)
         Me.SearchText_tb.Name = "SearchText_tb"
-        Me.SearchText_tb.Size = New System.Drawing.Size(717, 20)
+        Me.SearchText_tb.Size = New System.Drawing.Size(856, 20)
         Me.SearchText_tb.TabIndex = 1
         '
         'Label1
@@ -129,7 +131,7 @@ Partial Class Main_Form
         '
         Me.Label2.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(797, 15)
+        Me.Label2.Location = New System.Drawing.Point(936, 15)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(15, 13)
         Me.Label2.TabIndex = 3
@@ -139,7 +141,7 @@ Partial Class Main_Form
         '
         Me.SearchIn_cobo.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.SearchIn_cobo.FormattingEnabled = True
-        Me.SearchIn_cobo.Location = New System.Drawing.Point(818, 12)
+        Me.SearchIn_cobo.Location = New System.Drawing.Point(957, 12)
         Me.SearchIn_cobo.Name = "SearchIn_cobo"
         Me.SearchIn_cobo.Size = New System.Drawing.Size(171, 21)
         Me.SearchIn_cobo.TabIndex = 4
@@ -147,7 +149,7 @@ Partial Class Main_Form
         'SearchGo_btn
         '
         Me.SearchGo_btn.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.SearchGo_btn.Location = New System.Drawing.Point(995, 10)
+        Me.SearchGo_btn.Location = New System.Drawing.Point(1134, 10)
         Me.SearchGo_btn.Name = "SearchGo_btn"
         Me.SearchGo_btn.Size = New System.Drawing.Size(36, 23)
         Me.SearchGo_btn.TabIndex = 5
@@ -158,7 +160,7 @@ Partial Class Main_Form
         '
         Me.Save_btn.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Save_btn.ForeColor = System.Drawing.Color.Green
-        Me.Save_btn.Location = New System.Drawing.Point(956, 496)
+        Me.Save_btn.Location = New System.Drawing.Point(1095, 496)
         Me.Save_btn.Name = "Save_btn"
         Me.Save_btn.Size = New System.Drawing.Size(75, 23)
         Me.Save_btn.TabIndex = 6
@@ -168,7 +170,7 @@ Partial Class Main_Form
         'Load_btn
         '
         Me.Load_btn.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Load_btn.Location = New System.Drawing.Point(875, 496)
+        Me.Load_btn.Location = New System.Drawing.Point(1014, 496)
         Me.Load_btn.Name = "Load_btn"
         Me.Load_btn.Size = New System.Drawing.Size(75, 23)
         Me.Load_btn.TabIndex = 7
@@ -232,18 +234,41 @@ Partial Class Main_Form
         'LoadFromAlertsJson_btn
         '
         Me.LoadFromAlertsJson_btn.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.LoadFromAlertsJson_btn.Location = New System.Drawing.Point(733, 496)
+        Me.LoadFromAlertsJson_btn.Location = New System.Drawing.Point(872, 496)
         Me.LoadFromAlertsJson_btn.Name = "LoadFromAlertsJson_btn"
         Me.LoadFromAlertsJson_btn.Size = New System.Drawing.Size(136, 23)
         Me.LoadFromAlertsJson_btn.TabIndex = 13
         Me.LoadFromAlertsJson_btn.Text = "Load from alerts.json"
         Me.LoadFromAlertsJson_btn.UseVisualStyleBackColor = True
         '
+        'GetImplementationCode_btn
+        '
+        Me.GetImplementationCode_btn.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.GetImplementationCode_btn.Location = New System.Drawing.Point(569, 496)
+        Me.GetImplementationCode_btn.Name = "GetImplementationCode_btn"
+        Me.GetImplementationCode_btn.Size = New System.Drawing.Size(138, 23)
+        Me.GetImplementationCode_btn.TabIndex = 14
+        Me.GetImplementationCode_btn.Text = "Get implementation code"
+        Me.GetImplementationCode_btn.UseVisualStyleBackColor = True
+        '
+        'ImplementCode_cb
+        '
+        Me.ImplementCode_cb.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.ImplementCode_cb.AutoSize = True
+        Me.ImplementCode_cb.Location = New System.Drawing.Point(713, 500)
+        Me.ImplementCode_cb.Name = "ImplementCode_cb"
+        Me.ImplementCode_cb.Size = New System.Drawing.Size(119, 17)
+        Me.ImplementCode_cb.TabIndex = 15
+        Me.ImplementCode_cb.Text = "Implement Filename"
+        Me.ImplementCode_cb.UseVisualStyleBackColor = True
+        '
         'Main_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1043, 531)
+        Me.ClientSize = New System.Drawing.Size(1182, 531)
+        Me.Controls.Add(Me.ImplementCode_cb)
+        Me.Controls.Add(Me.GetImplementationCode_btn)
         Me.Controls.Add(Me.LoadFromAlertsJson_btn)
         Me.Controls.Add(Me.Check_btn)
         Me.Controls.Add(Me.Generate_btn)
@@ -258,6 +283,7 @@ Partial Class Main_Form
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.SearchText_tb)
         Me.Controls.Add(Me.DataGridView1)
+        Me.MinimumSize = New System.Drawing.Size(1198, 570)
         Me.Name = "Main_Form"
         Me.Text = "Alerts Generator"
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
@@ -286,4 +312,6 @@ Partial Class Main_Form
     Friend WithEvents TranslatedValue As DataGridViewTextBoxColumn
     Friend WithEvents IsFormatted As DataGridViewCheckBoxColumn
     Friend WithEvents LoadFromAlertsJson_btn As Button
+    Friend WithEvents GetImplementationCode_btn As Button
+    Friend WithEvents ImplementCode_cb As CheckBox
 End Class

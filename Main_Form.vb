@@ -432,6 +432,27 @@ Public Class Main_Form
         If Result = MsgBoxResult.Yes Then MyData.Save()
         e.Cancel = (Result = MsgBoxResult.Cancel)
     End Sub
+
+    Private Sub GetImplementationCode_btn_Click(sender As Object, e As EventArgs) Handles GetImplementationCode_btn.Click
+        Dim SelectedRows = DataGridView1.SelectedRows
+        Dim ThisRow As DataGridViewRow
+        If SelectedRows.Count >= 1 Then ThisRow = SelectedRows(0) Else MsgBox("Plese make sure to select at least one row!", MsgBoxStyle.Information) : Return
+
+        If ThisRow.Cells(5).Value?.ToString().ToLower() = "true" Then
+            Dim Variables As List(Of String) = ThisRow.Cells(2).Value?.ToString().Split("_").ToList()
+            Variables.Remove(Variables.First()) 'Ignore actual name of the entire placeholder
+            Variables = Variables.ConvertAll(Of String)(Function(X) X.ToLower()) 'Make all variables lowercase only
+
+            If Variables.Count <= 0 Then MsgBox("Make sure to check your table before using this feature!", MsgBoxStyle.Information) : Return
+            Dim ResultString As String = $"Alerts.GetFormattedAlert(""{ThisRow.Cells(2).Value?.ToString()}"", {String.Join(", ", Variables)})"
+            If ImplementCode_cb.Checked AndAlso ThisRow.Cells(0).Value?.ToString().ToLower() = "console" Then ResultString = $"$""[{ThisRow.Cells(1).Value?.ToString()}] {{{ResultString}}}"""
+            Clipboard.SetText(ResultString)
+        Else
+            Dim ResultString As String = $"Alerts.GetAlert(""{ThisRow.Cells(2).Value?.ToString()}"")"
+            If ImplementCode_cb.Checked AndAlso ThisRow.Cells(0).Value?.ToString().ToLower() = "console" Then ResultString = $"$""[{ThisRow.Cells(1).Value?.ToString()}] {{{ResultString}}}"""
+            Clipboard.SetText(ResultString)
+        End If
+    End Sub
 End Class
 
 
@@ -469,6 +490,7 @@ Public Class DataTable
 
     Sub Save()
         LastChanged = Date.Now
+        Main_Form.Text = $"{Application.ProductName} | Last changed: {LastChanged.ToString("dd.MM.yyyy HH:mm:ss")}"
         Dim json As String = JsonConvert.SerializeObject(Me, Formatting.Indented)
 
         If Not Directory.Exists(My.Settings.MyDataPath) Then Directory.CreateDirectory(Path.GetDirectoryName(My.Settings.MyDataPath))
@@ -483,6 +505,7 @@ Public Class DataTable
 
                 'Insert data into the object
                 LastChanged = Data.LastChanged
+                Main_Form.Text = $"{Application.ProductName} | Last changed: {LastChanged.ToString("dd.MM.yyyy HH:mm:ss")}"
                 Rows = Data.Rows
 
             Catch ex As Exception
