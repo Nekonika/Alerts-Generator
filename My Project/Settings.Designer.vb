@@ -57,54 +57,6 @@ Namespace My
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("")>  _
-        Public Property AlertsScriptTemplatePath() As String
-            Get
-                Return CType(Me("AlertsScriptTemplatePath"),String)
-            End Get
-            Set
-                Me("AlertsScriptTemplatePath") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
-        Public Property AlertsScriptResultPath() As String
-            Get
-                Return CType(Me("AlertsScriptResultPath"),String)
-            End Get
-            Set
-                Me("AlertsScriptResultPath") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
-        Public Property AlertsJsonResultPath() As String
-            Get
-                Return CType(Me("AlertsJsonResultPath"),String)
-            End Get
-            Set
-                Me("AlertsJsonResultPath") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
-        Public Property MyDataPath() As String
-            Get
-                Return CType(Me("MyDataPath"),String)
-            End Get
-            Set
-                Me("MyDataPath") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
         Public Property AlertTypeHeading() As String
             Get
                 Return CType(Me("AlertTypeHeading"),String)
@@ -135,6 +87,18 @@ Namespace My
             End Get
             Set
                 Me("FormattedTitle") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property DataPath() As String
+            Get
+                Return CType(Me("DataPath"),String)
+            End Get
+            Set
+                Me("DataPath") = value
             End Set
         End Property
     End Class

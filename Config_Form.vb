@@ -91,10 +91,10 @@ Public Class Config_Form
 
     Private Sub LoadData()
         'Load Path Settings
-        DataPath_tb.Text = My.Settings.MyDataPath
-        AlertsTemplatePath_tb.Text = My.Settings.AlertsScriptTemplatePath
-        AlertsResultPath_tb.Text = My.Settings.AlertsScriptResultPath
-        AlertsJsonPath_tb.Text = My.Settings.AlertsJsonResultPath
+        DataPath_tb.Text = My.Settings.DataPath
+        AlertsTemplatePath_tb.Text = MyData.PathVariables.AlertsTemplatePath
+        AlertsResultPath_tb.Text = MyData.PathVariables.AlertsResultPath
+        AlertsJsonPath_tb.Text = MyData.PathVariables.AlertsJsonPath
 
         'Load Formatting Settings
         AlertTypeHeading_tb.Text = My.Settings.AlertTypeHeading
@@ -104,14 +104,16 @@ Public Class Config_Form
 
     Private Sub SaveData()
         'Save Path Settings
-        My.Settings.MyDataPath = DataPath_tb.Text
-        My.Settings.AlertsScriptTemplatePath = AlertsTemplatePath_tb.Text
-        My.Settings.AlertsScriptResultPath = AlertsResultPath_tb.Text
-        My.Settings.AlertsJsonResultPath = AlertsJsonPath_tb.Text
+        My.Settings.DataPath = DataPath_tb.Text
+        MyData.PathVariables.AlertsTemplatePath = AlertsTemplatePath_tb.Text
+        MyData.PathVariables.AlertsResultPath = AlertsResultPath_tb.Text
+        MyData.PathVariables.AlertsJsonPath = AlertsJsonPath_tb.Text
+        MyData.Save()
 
         'Save Formatting Settings
         My.Settings.AlertTypeHeading = AlertTypeHeading_tb.Text
         My.Settings.FilenameHeading = FilenameHeading_tb.Text
         My.Settings.FormattedTitle = FormattedTitle_tb.Text
+        My.Settings.Save()
     End Sub
 End Class

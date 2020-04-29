@@ -4,8 +4,6 @@ Imports Newtonsoft.Json
 
 Public Class Main_Form
 
-    ReadOnly MyData As DataTable = New DataTable
-
     Private Sub SearchGo_btn_Click(sender As Object, e As EventArgs) Handles SearchGo_btn.Click
         'Start searching with the given criteria
         '(Search for "true" / "false" or text in the given column)
@@ -78,21 +76,18 @@ Public Class Main_Form
         '(Maybe also ask which of those files shall be generated)
 
         'Make sure all important files exist
-        If Not Directory.Exists(Path.GetDirectoryName(My.Settings.AlertsScriptTemplatePath)) Then Directory.CreateDirectory(Path.GetDirectoryName(My.Settings.AlertsScriptTemplatePath))
-        If Not Directory.Exists(Path.GetDirectoryName(My.Settings.AlertsScriptResultPath)) Then Directory.CreateDirectory(Path.GetDirectoryName(My.Settings.AlertsScriptResultPath))
-        If Not Directory.Exists(Path.GetDirectoryName(My.Settings.AlertsJsonResultPath)) Then Directory.CreateDirectory(Path.GetDirectoryName(My.Settings.AlertsJsonResultPath))
-        If Not IO.File.Exists(My.Settings.AlertsScriptTemplatePath) Then IO.File.WriteAllText(My.Settings.AlertsScriptTemplatePath, "")
-        If Not IO.File.Exists(My.Settings.AlertsScriptResultPath) Then IO.File.WriteAllText(My.Settings.AlertsScriptResultPath, "")
-        If Not IO.File.Exists(My.Settings.AlertsJsonResultPath) Then IO.File.WriteAllText(My.Settings.AlertsJsonResultPath, "")
+        If Not Directory.Exists(Path.GetDirectoryName(MyData.PathVariables.AlertsTemplatePath)) Then Directory.CreateDirectory(Path.GetDirectoryName(MyData.PathVariables.AlertsTemplatePath))
+        If Not Directory.Exists(Path.GetDirectoryName(MyData.PathVariables.AlertsResultPath)) Then Directory.CreateDirectory(Path.GetDirectoryName(MyData.PathVariables.AlertsResultPath))
+        If Not Directory.Exists(Path.GetDirectoryName(MyData.PathVariables.AlertsJsonPath)) Then Directory.CreateDirectory(Path.GetDirectoryName(MyData.PathVariables.AlertsJsonPath))
+        If Not IO.File.Exists(MyData.PathVariables.AlertsTemplatePath) Then IO.File.WriteAllText(MyData.PathVariables.AlertsTemplatePath, "")
+        If Not IO.File.Exists(MyData.PathVariables.AlertsResultPath) Then IO.File.WriteAllText(MyData.PathVariables.AlertsResultPath, "")
+        If Not IO.File.Exists(MyData.PathVariables.AlertsJsonPath) Then IO.File.WriteAllText(MyData.PathVariables.AlertsJsonPath, "")
 
 
         GenerateAlertsVB()
         GenerateAlertsJSON()
 
         MsgBox("Successfully Generated Files!")
-
-        'TODO: Generate 'alerts.json'-File here!
-        'Debug.WriteLine("Successfully generated 'Alerts.vb'-File.")
     End Sub
 
     Private Sub LoadFromAlertsJson_btn_Click(sender As Object, e As EventArgs) Handles LoadFromAlertsJson_btn.Click
@@ -305,7 +300,7 @@ Public Class Main_Form
     '
 
     Private Sub GenerateAlertsVB()
-        Dim AlertsTemplateContent As String = IO.File.ReadAllText(My.Settings.AlertsScriptTemplatePath)
+        Dim AlertsTemplateContent As String = IO.File.ReadAllText(MyData.PathVariables.AlertsTemplatePath)
         Dim GeneratedAlertVBContent As String = String.Empty
         Dim GeneratedAlertVBContentVariables As String = String.Empty
 
@@ -380,7 +375,7 @@ Public Class Main_Form
             End While
         End If
 
-        IO.File.WriteAllText(My.Settings.AlertsScriptResultPath, AlertsTemplateContent.Replace("[ALERTS_VB]", GeneratedAlertVBContent).Replace("[ALERTS_VARS_VB]", GeneratedAlertVBContentVariables))
+        IO.File.WriteAllText(MyData.PathVariables.AlertsResultPath, AlertsTemplateContent.Replace("[ALERTS_VB]", GeneratedAlertVBContent).Replace("[ALERTS_VARS_VB]", GeneratedAlertVBContentVariables))
     End Sub
 
     Sub GenerateAlertsJSON()
@@ -395,7 +390,7 @@ Public Class Main_Form
 
         'OPTIONAL: Sort data by Key
 
-        IO.File.WriteAllText(My.Settings.AlertsJsonResultPath, JsonConvert.SerializeObject(JsonObject, Formatting.Indented))
+        IO.File.WriteAllText(MyData.PathVariables.AlertsJsonPath, JsonConvert.SerializeObject(JsonObject, Formatting.Indented))
     End Sub
 
 
@@ -404,16 +399,42 @@ Public Class Main_Form
     '
 
     Private Sub Main_Form_Load(sender As Object, e As EventArgs) Handles Me.Load
+        If String.IsNullOrWhiteSpace(My.Settings.DataPath) Then
+            Dim MyFileDialog As New OpenFileDialog() With {
+                .CheckFileExists = False,
+                .CheckPathExists = True,
+                .DereferenceLinks = True,
+                .FileName = "data.json",
+                .Filter = "JSON-File (*.json)|*.json",
+                .InitialDirectory = Path.GetDirectoryName(Directory.GetCurrentDirectory()),
+                .Multiselect = False,
+                .ShowReadOnly = False,
+                .SupportMultiDottedExtensions = False,
+                .Title = "Please select where your data.json file should be saved at (or already is):"
+            }
+
+            If MyFileDialog.ShowDialog() = DialogResult.OK Then
+                My.Settings.DataPath = MyFileDialog.FileName
+                MyData.Load()
+                My.Settings.Save()
+            Else
+                Application.Exit()
+            End If
+        End If
+
         'Load Fields to search
         For i = 0 To DataGridView1.ColumnCount - 1
             SearchIn_cobo.Items.Add(DataGridView1.Columns(i).HeaderText)
         Next
 
         'CheckPathVariables
-        If String.IsNullOrWhiteSpace(My.Settings.MyDataPath) Then My.Settings.MyDataPath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "data.json")
-        If String.IsNullOrWhiteSpace(My.Settings.AlertsScriptTemplatePath) Then My.Settings.AlertsScriptTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "AlertsTemplate.vb")
-        If String.IsNullOrWhiteSpace(My.Settings.AlertsScriptResultPath) Then My.Settings.AlertsScriptResultPath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Alerts.vb")
-        If String.IsNullOrWhiteSpace(My.Settings.AlertsJsonResultPath) Then My.Settings.AlertsJsonResultPath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "alerts.json")
+        If String.IsNullOrWhiteSpace(MyData.PathVariables.AlertsTemplatePath) _
+            OrElse String.IsNullOrWhiteSpace(MyData.PathVariables.AlertsResultPath) _
+            OrElse String.IsNullOrWhiteSpace(MyData.PathVariables.AlertsJsonPath) Then
+
+            MsgBox("Resetting path variables, as those seem to be corrupted!", MsgBoxStyle.Critical)
+            MyData.PathVariables = New PathVariables
+        End If
 
         'Check Placeholder Variables
         If String.IsNullOrWhiteSpace(My.Settings.AlertTypeHeading) Then My.Settings.AlertTypeHeading = $"{vbNewLine}{vbNewLine}'{vbNewLine}' [ALERTTYPE]{vbNewLine}'{vbNewLine}"
@@ -450,146 +471,5 @@ Public Class Main_Form
             If ImplementCode_cb.Checked AndAlso ThisRow.Cells(0).Value?.ToString().ToLower() = "console" Then ResultString = $"$""[{ThisRow.Cells(1).Value?.ToString()}] {{{ResultString}}}"""
             Clipboard.SetText(ResultString)
         End If
-    End Sub
-End Class
-
-
-'TODO: Store path variables in DataTable (in Json)
-
-'
-' Classes
-'
-
-Public Class DataTable
-    Property LastChanged As Date
-    Property Rows As List(Of RowData)
-
-    Sub New()
-        LastChanged = Date.Now
-        Rows = New List(Of RowData)
-    End Sub
-
-    Private Sub AddRow(RowData As RowData)
-        Rows.Add(RowData)
-    End Sub
-
-    Sub ReadFromDataTable()
-        Try
-            Rows.Clear()
-
-            For i = 0 To Main_Form.DataGridView1.Rows.Count - 2
-                Dim Row As DataGridViewRow = Main_Form.DataGridView1.Rows(i)
-                AddRow(New RowData([Enum].Parse(GetType(AlertType), Row.Cells(0).Value), Row.Cells(1).Value, Row.Cells(2).Value, Row.Cells(3).Value, Row.Cells(4).Value, Row.Cells(5).Value = "true"))
-            Next
-
-            Save()
-        Catch ex As Exception
-            MsgBox("Could not load data into 'DataTable'-Object.{vbNewLine}Try using Check button before Saving!", MsgBoxStyle.Critical)
-        End Try
-    End Sub
-
-    Sub Save()
-        LastChanged = Date.Now
-        Main_Form.Text = $"{Application.ProductName} | Last changed: {LastChanged.ToString("dd.MM.yyyy HH:mm:ss")}"
-        Dim json As String = JsonConvert.SerializeObject(Me, Formatting.Indented)
-
-        If Not Directory.Exists(My.Settings.MyDataPath) Then Directory.CreateDirectory(Path.GetDirectoryName(My.Settings.MyDataPath))
-        File.WriteAllText(My.Settings.MyDataPath, json)
-    End Sub
-
-    Sub Load()
-        If File.Exists(My.Settings.MyDataPath) Then
-            Try
-                Dim json = File.ReadAllText(My.Settings.MyDataPath)
-                Dim Data As DataTable = JsonConvert.DeserializeObject(Of DataTable)(json)
-
-                'Insert data into the object
-                LastChanged = Data.LastChanged
-                Main_Form.Text = $"{Application.ProductName} | Last changed: {LastChanged.ToString("dd.MM.yyyy HH:mm:ss")}"
-                Rows = Data.Rows
-
-            Catch ex As Exception
-                MsgBox($"Unable to read 'data.json' file.{vbNewLine}Try deleting the File. (Remember to make a backup if needed!)", MsgBoxStyle.Critical)
-                Application.Exit()
-            End Try
-        Else
-            Save()
-        End If
-    End Sub
-
-    Sub FillTable()
-        Main_Form.DataGridView1.Rows.Clear()
-
-        For Each Row In Rows
-            Main_Form.DataGridView1.Rows.Add([Enum].GetName(GetType(AlertType), Row.Type),
-                                                Row.Filename,
-                                                Row.VariableName,
-                                                Row.DefaultTranslation,
-                                                Row.AdvancedTranslation,
-                                                Row.IsFormatted
-            )
-        Next
-    End Sub
-
-    Function Clone() As DataTable
-        Return New DataTable With {
-            .LastChanged = LastChanged,
-            .Rows = Rows
-        }
-    End Function
-
-End Class
-
-Public Class RowData
-    Property Type As AlertType
-    Property Filename As String
-    Property VariableName As String
-    Property DefaultTranslation As String
-    Property AdvancedTranslation As String
-    Property IsFormatted As Boolean
-
-    Sub New(Type As AlertType, Filename As String, VariableName As String, DefaultTranslation As String, AdvancedTranslation As String, IsFormatted As Boolean)
-        Me.Type = Type
-        Me.Filename = Filename
-        Me.VariableName = VariableName
-        Me.DefaultTranslation = DefaultTranslation
-        Me.AdvancedTranslation = AdvancedTranslation
-        Me.IsFormatted = IsFormatted
-    End Sub
-End Class
-
-Public Enum AlertType
-    Console
-    Message
-End Enum
-
-Public Class Mismatch
-    Property Column As Integer
-    Property Row As Integer
-    Property IssueText As String
-    Property CellContent As String
-
-    Sub New(Column As Integer, Row As Integer, IssueText As String, CellContent As String)
-        Me.Column = Column
-        Me.Row = Row
-        Me.IssueText = IssueText
-        Me.CellContent = CellContent
-    End Sub
-
-    Public Overloads Function ToString()
-        Return _
-            $"Row {Row} Column {Column} issued!" & vbNewLine &
-            $"Context: ""{CellContent}""" & vbNewLine &
-            $"Error Text: {IssueTexts(IssueText)}"
-    End Function
-End Class
-
-Public Class CheckDataResult
-    Property IsSuccess As Boolean
-    Property Mismatches As List(Of Mismatch)
-
-    Sub New(IsSuccess As Boolean, Mismatches As List(Of Mismatch))
-        Me.IsSuccess = IsSuccess
-        Me.Mismatches = Mismatches
     End Sub
 End Class
