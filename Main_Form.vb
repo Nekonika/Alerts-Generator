@@ -211,22 +211,20 @@ Public Class Main_Form
                     Mismatches.Add(New Mismatch(3, i, "Underscore_Missing", Var_Name_Val))
                 ElseIf Contains_Underscore AndAlso Not IsFormatted_Val Then
                     Mismatches.Add(New Mismatch(6, i, "IsFormatted_Is_Set_Falsely", Var_Name_Val))
-                End If
+                Else
+                    'Count underscores in Var-Name And compare to count of '{' & '}' in translations to make sure all variables are given
+                    Dim RequiredVarCount As Integer = Var_Name_Val.Count(Function(X) X.Equals("_"c))
 
-                'Check variables in translations
-                Dim RequiredVarCount As Integer = Var_Name_Val.Count(Function(X) X.Equals("_"c))
-
-                If RequiredVarCount > 0 Then
-                    For c = 0 To RequiredVarCount - 1
-                        Dim currentVar As String = $"{{{c}}}"
-                        If Not Def_Tran_Val.Contains(currentVar) Then Mismatches.Add(New Mismatch(4, i, "Formatting_Not_Match", Def_Tran_Val))
-                        If Not Adv_Tran_Val.Contains(currentVar) Then Mismatches.Add(New Mismatch(5, i, "Formatting_Not_Match", Adv_Tran_Val))
-                    Next
+                    If RequiredVarCount > 0 Then
+                        For c = 0 To RequiredVarCount - 1
+                            Dim currentVar As String = $"{{{c}}}"
+                            If Not Def_Tran_Val.Contains(currentVar) Then Mismatches.Add(New Mismatch(4, i, "Formatting_Not_Match", Def_Tran_Val))
+                            If Not Adv_Tran_Val.Contains(currentVar) Then Mismatches.Add(New Mismatch(5, i, "Formatting_Not_Match", Adv_Tran_Val))
+                        Next
+                    End If
                 End If
             End If
         Next
-
-        'TODO: Count underscores in Var-Name and compare to count of '{' & '}' in translations to make sure all variables are given
 
         Return New CheckDataResult(Mismatches.Count = 0, Mismatches)
     End Function
@@ -455,6 +453,8 @@ Public Class Main_Form
     End Sub
 End Class
 
+
+'TODO: Store path variables in DataTable (in Json)
 
 '
 ' Classes
