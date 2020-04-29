@@ -83,9 +83,9 @@ Public Class Main_Form
         If Not IO.File.Exists(MyData.PathVariables.AlertsResultPath) Then IO.File.WriteAllText(MyData.PathVariables.AlertsResultPath, "")
         If Not IO.File.Exists(MyData.PathVariables.AlertsJsonPath) Then IO.File.WriteAllText(MyData.PathVariables.AlertsJsonPath, "")
 
-
-        GenerateAlertsVB()
-        GenerateAlertsJSON()
+        'Initialize actual generating
+        If MyData.GenerateSettings.GenerateVB Then GenerateAlertsVB()
+        If MyData.GenerateSettings.GenerateJSON Then GenerateAlertsJSON()
 
         MsgBox("Successfully Generated Files!")
     End Sub
@@ -378,7 +378,7 @@ Public Class Main_Form
         IO.File.WriteAllText(MyData.PathVariables.AlertsResultPath, AlertsTemplateContent.Replace("[ALERTS_VB]", GeneratedAlertVBContent).Replace("[ALERTS_VARS_VB]", GeneratedAlertVBContentVariables))
     End Sub
 
-    Sub GenerateAlertsJSON()
+    Shared Sub GenerateAlertsJSON()
         Dim JsonObject As New Dictionary(Of String, String)
 
         'Get current data from our object into a seperate variable
@@ -415,7 +415,6 @@ Public Class Main_Form
 
             If MyFileDialog.ShowDialog() = DialogResult.OK Then
                 My.Settings.DataPath = MyFileDialog.FileName
-                MyData.Load()
                 My.Settings.Save()
             Else
                 Application.Exit()

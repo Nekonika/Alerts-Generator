@@ -42,12 +42,14 @@ End Module
 Public Class DataTable
     Property LastChanged As Date
     Property PathVariables As PathVariables
+    Property GenerateSettings As GenerateSettings
     Property Rows As List(Of RowData)
 
     Sub New()
         LastChanged = Date.Now
         PathVariables = New PathVariables
         Rows = New List(Of RowData)
+        GenerateSettings = New GenerateSettings
     End Sub
 
     Private Sub AddRow(RowData As RowData)
@@ -86,8 +88,11 @@ Public Class DataTable
 
                 'Insert data into the object
                 LastChanged = Data.LastChanged
-                Main_Form.Text = $"{Application.ProductName} | Last changed: {LastChanged.ToString("dd.MM.yyyy HH:mm:ss")}"
+                PathVariables = Data.PathVariables
+                GenerateSettings = Data.GenerateSettings
                 Rows = Data.Rows
+
+                Main_Form.Text = $"{Application.ProductName} | Last changed: {LastChanged.ToLongDateString()} {LastChanged.ToShortTimeString()}"
 
             Catch ex As Exception
                 MsgBox($"Unable to read '{Path.GetFileName(My.Settings.DataPath)}' file.{vbNewLine}Try deleting the File. (Remember to make a backup if needed!)", MsgBoxStyle.Critical)
@@ -96,6 +101,8 @@ Public Class DataTable
         Else
             Save()
         End If
+
+        Config_Form.LoadData() 'Load Data into our Config Form
     End Sub
 
     Sub FillTable()
@@ -115,6 +122,8 @@ Public Class DataTable
     Function Clone() As DataTable
         Return New DataTable With {
             .LastChanged = LastChanged,
+            .GenerateSettings = GenerateSettings,
+            .PathVariables = PathVariables,
             .Rows = Rows
         }
     End Function
@@ -140,6 +149,21 @@ Public Class PathVariables
         AlertsJsonPath = Path.Combine(BaseDir, "Result", "alerts.json")
     End Sub
 
+End Class
+
+Public Class GenerateSettings
+    Property GenerateVB As Boolean
+    Property GenerateJSON As Boolean
+
+    Sub New(GenerateVB As Boolean, GenerateJSON As Boolean)
+        Me.GenerateVB = GenerateVB
+        Me.GenerateJSON = GenerateJSON
+    End Sub
+
+    Sub New()
+        GenerateVB = True
+        GenerateJSON = True
+    End Sub
 End Class
 
 Public Class RowData

@@ -1,12 +1,12 @@
 ﻿Imports System.IO
 
 Public Class Config_Form
-    Private Sub Config_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub Config_Form_Load() Handles MyBase.Load
         LoadData()
     End Sub
 
-    Private Sub Config_Form_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        SaveData()
+    Private Sub Config_Form_FormClosing() Handles MyBase.FormClosing
+        If Not String.IsNullOrWhiteSpace(My.Settings.DataPath) Then SaveData()
     End Sub
 
     Private Sub DataPathBrowse_btn_Click(sender As Object, e As EventArgs) Handles DataPathBrowse_btn.Click
@@ -89,12 +89,16 @@ Public Class Config_Form
         End If
     End Sub
 
-    Private Sub LoadData()
+    Public Sub LoadData()
         'Load Path Settings
         DataPath_tb.Text = My.Settings.DataPath
+
         AlertsTemplatePath_tb.Text = MyData.PathVariables.AlertsTemplatePath
         AlertsResultPath_tb.Text = MyData.PathVariables.AlertsResultPath
         AlertsJsonPath_tb.Text = MyData.PathVariables.AlertsJsonPath
+
+        GenerateJSON_cb.Checked = MyData.GenerateSettings.GenerateJSON
+        GenerateVB_cb.Checked = MyData.GenerateSettings.GenerateVB
 
         'Load Formatting Settings
         AlertTypeHeading_tb.Text = My.Settings.AlertTypeHeading
@@ -102,12 +106,17 @@ Public Class Config_Form
         FormattedTitle_tb.Text = My.Settings.FormattedTitle
     End Sub
 
-    Private Sub SaveData()
+    Public Sub SaveData()
         'Save Path Settings
         My.Settings.DataPath = DataPath_tb.Text
+
         MyData.PathVariables.AlertsTemplatePath = AlertsTemplatePath_tb.Text
         MyData.PathVariables.AlertsResultPath = AlertsResultPath_tb.Text
         MyData.PathVariables.AlertsJsonPath = AlertsJsonPath_tb.Text
+
+        MyData.GenerateSettings.GenerateJSON = GenerateJSON_cb.Checked
+        MyData.GenerateSettings.GenerateVB = GenerateVB_cb.Checked
+
         MyData.Save()
 
         'Save Formatting Settings
@@ -115,5 +124,23 @@ Public Class Config_Form
         My.Settings.FilenameHeading = FilenameHeading_tb.Text
         My.Settings.FormattedTitle = FormattedTitle_tb.Text
         My.Settings.Save()
+    End Sub
+
+    Private Sub Load_btn_Click(sender As Object, e As EventArgs) Handles Load_btn.Click
+        LoadData()
+    End Sub
+
+    Private Sub Save_btn_Click(sender As Object, e As EventArgs) Handles Save_btn.Click
+        SaveData()
+    End Sub
+
+    Private Sub OpenDB_btn_Click(sender As Object, e As EventArgs) Handles OpenDB_btn.Click
+        If MsgBox($"Any unsaved changes will be lost!{vbNewLine}Are you sure you want to do that?", MsgBoxStyle.OkCancel) = MsgBoxResult.Ok Then
+            My.Settings.DataPath = String.Empty
+            LoadData()
+            My.Settings.Save()
+
+            Application.Restart()
+        End If
     End Sub
 End Class

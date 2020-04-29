@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class Config_Form
     Inherits System.Windows.Forms.Form
 
     'Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class Config_Form
     'Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
     'Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
     'Das Bearbeiten mit dem Code-Editor ist nicht möglich.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Config_Form))
         Me.AlertsTemplatePath_tb = New System.Windows.Forms.TextBox()
@@ -45,9 +45,18 @@ Partial Class Config_Form
         Me.Label7 = New System.Windows.Forms.Label()
         Me.AlertTypeHeading_tb = New System.Windows.Forms.TextBox()
         Me.Label6 = New System.Windows.Forms.Label()
+        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.GenerateVB_cb = New System.Windows.Forms.CheckBox()
+        Me.GenerateJSON_cb = New System.Windows.Forms.CheckBox()
+        Me.GroupBox5 = New System.Windows.Forms.GroupBox()
+        Me.Save_btn = New System.Windows.Forms.Button()
+        Me.Load_btn = New System.Windows.Forms.Button()
+        Me.OpenDB_btn = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
+        Me.GroupBox4.SuspendLayout()
+        Me.GroupBox5.SuspendLayout()
         Me.SuspendLayout()
         '
         'AlertsTemplatePath_tb
@@ -282,15 +291,98 @@ Partial Class Config_Form
         Me.Label6.TabIndex = 0
         Me.Label6.Text = "Alerts Type Heading:"
         '
+        'GroupBox4
+        '
+        Me.GroupBox4.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox4.Controls.Add(Me.GenerateVB_cb)
+        Me.GroupBox4.Controls.Add(Me.GenerateJSON_cb)
+        Me.GroupBox4.Location = New System.Drawing.Point(12, 322)
+        Me.GroupBox4.Name = "GroupBox4"
+        Me.GroupBox4.Size = New System.Drawing.Size(517, 64)
+        Me.GroupBox4.TabIndex = 12
+        Me.GroupBox4.TabStop = False
+        Me.GroupBox4.Text = "Generate Settings"
+        '
+        'GenerateVB_cb
+        '
+        Me.GenerateVB_cb.AutoSize = True
+        Me.GenerateVB_cb.Location = New System.Drawing.Point(6, 42)
+        Me.GenerateVB_cb.Name = "GenerateVB_cb"
+        Me.GenerateVB_cb.Size = New System.Drawing.Size(87, 17)
+        Me.GenerateVB_cb.TabIndex = 1
+        Me.GenerateVB_cb.Text = "Generate VB"
+        Me.GenerateVB_cb.UseVisualStyleBackColor = True
+        '
+        'GenerateJSON_cb
+        '
+        Me.GenerateJSON_cb.AutoSize = True
+        Me.GenerateJSON_cb.Location = New System.Drawing.Point(6, 19)
+        Me.GenerateJSON_cb.Name = "GenerateJSON_cb"
+        Me.GenerateJSON_cb.Size = New System.Drawing.Size(95, 17)
+        Me.GenerateJSON_cb.TabIndex = 0
+        Me.GenerateJSON_cb.Text = "Generate Json"
+        Me.GenerateJSON_cb.UseVisualStyleBackColor = True
+        '
+        'GroupBox5
+        '
+        Me.GroupBox5.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox5.Controls.Add(Me.OpenDB_btn)
+        Me.GroupBox5.Controls.Add(Me.Save_btn)
+        Me.GroupBox5.Controls.Add(Me.Load_btn)
+        Me.GroupBox5.Location = New System.Drawing.Point(535, 323)
+        Me.GroupBox5.Name = "GroupBox5"
+        Me.GroupBox5.Size = New System.Drawing.Size(353, 64)
+        Me.GroupBox5.TabIndex = 13
+        Me.GroupBox5.TabStop = False
+        Me.GroupBox5.Text = "Actions"
+        '
+        'Save_btn
+        '
+        Me.Save_btn.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Save_btn.Location = New System.Drawing.Point(252, 19)
+        Me.Save_btn.Name = "Save_btn"
+        Me.Save_btn.Size = New System.Drawing.Size(95, 39)
+        Me.Save_btn.TabIndex = 1
+        Me.Save_btn.Text = "Save"
+        Me.Save_btn.UseVisualStyleBackColor = True
+        '
+        'Load_btn
+        '
+        Me.Load_btn.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Load_btn.Location = New System.Drawing.Point(151, 19)
+        Me.Load_btn.Name = "Load_btn"
+        Me.Load_btn.Size = New System.Drawing.Size(95, 39)
+        Me.Load_btn.TabIndex = 0
+        Me.Load_btn.Text = "Load"
+        Me.Load_btn.UseVisualStyleBackColor = True
+        '
+        'OpenDB_btn
+        '
+        Me.OpenDB_btn.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.OpenDB_btn.Location = New System.Drawing.Point(9, 19)
+        Me.OpenDB_btn.Name = "OpenDB_btn"
+        Me.OpenDB_btn.Size = New System.Drawing.Size(136, 39)
+        Me.OpenDB_btn.TabIndex = 2
+        Me.OpenDB_btn.Text = "Open Database"
+        Me.OpenDB_btn.UseVisualStyleBackColor = True
+        '
         'Config_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(900, 329)
+        Me.ClientSize = New System.Drawing.Size(900, 398)
+        Me.Controls.Add(Me.GroupBox5)
+        Me.Controls.Add(Me.GroupBox4)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.MaximizeBox = False
+        Me.MaximumSize = New System.Drawing.Size(916, 437)
+        Me.MinimumSize = New System.Drawing.Size(916, 437)
         Me.Name = "Config_Form"
         Me.Text = "Configuration Page"
         Me.GroupBox1.ResumeLayout(False)
@@ -298,6 +390,9 @@ Partial Class Config_Form
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox3.PerformLayout()
+        Me.GroupBox4.ResumeLayout(False)
+        Me.GroupBox4.PerformLayout()
+        Me.GroupBox5.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -324,4 +419,11 @@ Partial Class Config_Form
     Friend WithEvents Label7 As Label
     Friend WithEvents AlertTypeHeading_tb As TextBox
     Friend WithEvents Label6 As Label
+    Friend WithEvents GroupBox4 As GroupBox
+    Friend WithEvents GenerateVB_cb As CheckBox
+    Friend WithEvents GenerateJSON_cb As CheckBox
+    Friend WithEvents GroupBox5 As GroupBox
+    Friend WithEvents Save_btn As Button
+    Friend WithEvents Load_btn As Button
+    Friend WithEvents OpenDB_btn As Button
 End Class
